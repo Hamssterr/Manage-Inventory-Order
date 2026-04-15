@@ -1,27 +1,48 @@
-import { FilterBar } from "@/components/filter-bar";
+import { FilterBar, type FilterDefinition } from "@/components/filter-bar";
 import { PageFooter } from "@/components/footer";
 import { TableData, type ColumnDef } from "@/components/table-data";
 import { TableError, TableLoading } from "@/components/table-loading";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useGetInventoryProducts } from "@/hooks/useInventory";
+import { CATEGORY_OPTIONS } from "@/constants/category-value";
+import {
+  useDeleteInventoryProduct,
+  useGetInventoryProducts,
+} from "@/hooks/useInventory";
+import { usePermission } from "@/hooks/usePermission";
 import type { IProduct } from "@/types/product";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const INVENTORY_CATEGORIES = [
-  { label: "Gia vị", value: "Gia vị" },
-  { label: "Bột giặt - Xà bông", value: "Bột giặt - Xà bông" },
-  { label: "Nước giải khát", value: "Nước giải khát" },
-];
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export const InventoryPage = () => {
+  const { hasRole } = usePermission();
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
   const limit = 15;
+
+  const [productToDelete, setProductToDelete] = useState<IProduct | null>(null);
 
   const { data, isLoading, isError, refetch } = useGetInventoryProducts({
     limit,
     page,
+    search: search !== "" ? search : undefined,
+    category: category !== "ALL" ? category : undefined,
   });
+
+  const { mutate: deleteProduct, isPending: isDeleting } =
+    useDeleteInventoryProduct();
 
   const products = useMemo(() => {
     return (
@@ -48,6 +69,53 @@ export const InventoryPage = () => {
   const handleNext = () => {
     if (currentPage < totalPages) setPage(currentPage + 1);
   };
+
+  const handleAddNew = () => {
+    navigate("/inventory/add");
+  };
+
+  const handleSearch = useCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, []);
+
+  const handleCategoryChange = useCallback((val: string) => {
+    setCategory(val);
+    setPage(1);
+  }, []);
+
+  const handleConfirmDelete = () => {
+    if (!productToDelete) return;
+
+    deleteProduct(productToDelete._id, {
+      onSuccess: () => {
+        toast.success("Xóa sản phẩm thành công!");
+        setProductToDelete(null);
+
+        if (products.length === 1 && currentPage > 1) {
+          setPage(currentPage - 1);
+        }
+      },
+      onError: (error: any) => {
+        const errorMessage =
+          error?.response?.data?.message || "Xóa thất bại! Vui lòng thử lại.";
+        toast.error(errorMessage);
+      },
+    });
+  };
+
+  const filters: FilterDefinition[] = useMemo(
+    () => [
+      {
+        key: "category",
+        placeholder: "Danh mục",
+        options: CATEGORY_OPTIONS,
+        value: category,
+        onChange: handleCategoryChange,
+      },
+    ],
+    [category, handleCategoryChange],
+  );
 
   const columns: ColumnDef<IProduct & { id: string }>[] = [
     {
@@ -93,25 +161,14 @@ export const InventoryPage = () => {
     },
   ];
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setPage(1); // Reset về trang 1 khi tìm kiếm
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    setPage(1); // Đổi danh mục thì cũng phải quay về trang 1
-  };
-
   return (
     <div className="flex flex-col h-full gap-4">
       <FilterBar
         onSearch={handleSearch}
-        onAddNew={() => console.log("Mở modal tạo mã vật tư mới")}
-        onCategoryChange={handleCategoryChange}
-        categories={INVENTORY_CATEGORIES}
+        onAddNew={
+          hasRole(["admin", "owner"]) ? () => handleAddNew() : undefined
+        }
+        filters={filters}
       />
       <div className="flex flex-col h-full bg-white rounded-xl border overflow-hidden">
         <div className="flex-1 min-h-0 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -123,9 +180,20 @@ export const InventoryPage = () => {
             <TableData
               data={products}
               columns={columns}
-              onView={(row) => console.log(row)}
-              onUpdate={(row) => console.log(row._id)}
-              onDelete={(row) => console.log(row._id)}
+              onView={(row) =>
+                navigate(`/inventory/${row._id}`, { state: { product: row } })
+              }
+              onUpdate={(row) =>
+                navigate(`/inventory/${row._id}/edit`, {
+                  state: { product: row },
+                })
+              }
+              onImport={(row) =>
+                navigate(`/inventory/${row._id}/import`, {
+                  state: { product: row },
+                })
+              }
+              onDelete={(row) => setProductToDelete(row)}
             />
           )}
         </div>
@@ -163,6 +231,50 @@ export const InventoryPage = () => {
           </div>
         </PageFooter>
       </div>
+
+      <AlertDialog
+        open={!!productToDelete}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isDeleting) setProductToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa sản phẩm</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa sản phẩm này?
+              {productToDelete && (
+                <div className="text-sm">
+                  <p className="font-bold text-base text-foreground mb-1">
+                    {productToDelete.name}
+                  </p>
+                  <p className="font-medium text-destructive text-xs">
+                    * Hành động này không thể hoàn tác và có thể ảnh hưởng đến
+                    dữ liệu liên quan.
+                  </p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setProductToDelete(null)}
+              disabled={isDeleting}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Đang xóa..." : "Xóa sản phẩm"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

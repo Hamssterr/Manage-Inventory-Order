@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { Eye, MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
+import { Eye, MoreHorizontal, Plus, SquarePen, Trash2 } from "lucide-react";
 
 export interface ColumnDef<T> {
   header: string;
@@ -30,6 +30,7 @@ interface TableDataProps<T> {
   onView?: (row: T) => void;
   onUpdate?: (row: T) => void;
   onDelete?: (row: T) => void;
+  onImport?: (row: T) => void;
   actionWidth?: string;
 }
 
@@ -39,6 +40,7 @@ export function TableData<T extends { id: string | number }>({
   onView,
   onUpdate,
   onDelete,
+  onImport,
   actionWidth = "w-[80px]",
 }: TableDataProps<T>) {
   return (
@@ -96,6 +98,12 @@ export function TableData<T extends { id: string | number }>({
                         <DropdownMenuItem onClick={() => onUpdate(row)}>
                           <SquarePen className="mr-2 h-4 w-4 text-muted-foreground" />
                           Cập nhật
+                        </DropdownMenuItem>
+                      )}
+                      {onImport && (
+                        <DropdownMenuItem onClick={() => onImport(row)}>
+                          <Plus className="mr-2 h-4 w-4 text-muted-foreground" />
+                          Nhập kho
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />

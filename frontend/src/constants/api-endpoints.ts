@@ -4,3 +4,7 @@ export const SignOut = "auth/logout";
 export const RefreshToken = "auth/refreshToken";
 export const AuthMe = "auth/me";
 export const GetInventoryProduct = "inventory/";
+export const CreateInventoryProduct = "inventory/add";
+export const UpdateInventoryProduct = "inventory/";
+export const ImportInventoryProduct = "inventory/";
+export const DeleteInventoryProduct = "inventory/";

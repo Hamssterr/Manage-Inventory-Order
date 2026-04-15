@@ -6,7 +6,7 @@ interface IMiniProduct {
   baseUnit: string;
 }
 
-interface IProductUnit {
+export interface IProductUnit {
   _id: string;
   unitName: string;
   exchangeValue: number;
@@ -40,12 +40,12 @@ export interface IProduct {
   totalBaseQuantity?: number;
   totalQuantity?: number;
   stockDisplay?: string;
+  displayQuantity?: string;
 
   // Metadata
-  createdBy: IUserInfo;
-  updatedBy: IUserInfo;
+  createdBy: IUserInfo | string;
+  updatedBy: IUserInfo | string;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
-

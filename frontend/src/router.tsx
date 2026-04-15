@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/guard/ProtectedRoute";
 import { PublicRoute } from "./components/guard/PublicRoute";
 import { RoleRoute } from "./components/guard/RoleRoute";
 import { InventoryPage } from "./pages/Inventory";
+import { InventoryModal } from "./pages/Inventory/inventory-modal";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -46,9 +47,17 @@ export const AppRoutes = () => {
             },
             {
               element: (
-                <RoleRoute allowedRoles={["accountant", "owner", "admin"]} />
+                <RoleRoute
+                  allowedRoles={["accountant", "owner", "admin", "salers"]}
+                />
               ),
-              children: [{ path: "inventory", element: <InventoryPage /> }],
+              children: [
+                { path: "inventory", element: <InventoryPage /> },
+                { path: "inventory/add", element: <InventoryModal /> },
+                { path: "inventory/:id", element: <InventoryModal /> },
+                { path: "inventory/:id/edit", element: <InventoryModal /> },
+                { path: "inventory/:id/import", element: <InventoryModal /> },
+              ],
             },
 
             {
