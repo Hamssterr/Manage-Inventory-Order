@@ -143,9 +143,9 @@ export const InventoryPage = () => {
       className: "w-[200px]",
       cell: (row) => (
         <div className="flex gap-1 flex-wrap">
-          {row.units.map((u) => (
+          {row.units.map((u, index) => (
             <span
-              key={u._id}
+              key={u.unitName || index}
               className={`flex gap-1 items-center text-[10px] px-1.5 py-0.5 rounded border border-input leading-none ${u.isDefault ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted/50"}`}
             >
               <p>{u.unitName}</p>
@@ -243,20 +243,21 @@ export const InventoryPage = () => {
             <AlertDialogTitle>Xóa sản phẩm</AlertDialogTitle>
             <AlertDialogDescription>
               Bạn có chắc chắn muốn xóa sản phẩm này?
+
               {productToDelete && (
-                <div className="text-sm">
-                  <p className="font-bold text-base text-foreground mb-1">
-                    {productToDelete.name}
-                  </p>
-                  <p className="font-medium text-destructive text-xs">
-                    * Hành động này không thể hoàn tác và có thể ảnh hưởng đến
-                    dữ liệu liên quan.
-                  </p>
-                </div>
-              )}
+            <div className="text-sm">
+              <p className="font-bold text-base text-foreground mb-1">
+                {productToDelete.name}
+              </p>
+              <p className="font-medium text-destructive text-xs">
+                * Hành động này không thể hoàn tác và có thể ảnh hưởng đến dữ
+                liệu liên quan.
+              </p>
+            </div>
+          )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-
+          
           <AlertDialogFooter>
             <Button
               variant="outline"

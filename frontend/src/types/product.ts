@@ -1,13 +1,14 @@
+import type { BaseListResponse } from "./pagination";
 import type { IUserInfo } from "./user";
 
 interface IMiniProduct {
   _id: string;
   name: string;
-  baseUnit: string;
+  sku: string;
+  baseUnit?: string;
 }
 
 export interface IProductUnit {
-  _id: string;
   unitName: string;
   exchangeValue: number;
   priceDefault: number;
@@ -17,7 +18,6 @@ export interface IProductUnit {
 interface IProductComponent {
   productId: IMiniProduct;
   quantityPerBaseUnit: number;
-  _id: string;
 }
 
 export interface IProduct {
@@ -49,3 +49,11 @@ export interface IProduct {
   updatedAt: string;
   __v: number;
 }
+export interface ProductParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+}
+
+export type GetProductResponse = BaseListResponse<IProduct>;

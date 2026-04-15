@@ -52,9 +52,9 @@ export const ImportCard = ({ form, units, isImportMode }: ImportCardProps) => {
                   <SelectValue placeholder="Chọn đơn vị" />
                 </SelectTrigger>
                 <SelectContent position="popper" align="start">
-                  {units.map((u) => (
+                  {units.map((u, index) => (
                     <SelectItem
-                      key={u._id}
+                      key={u.unitName || index}
                       value={u.unitName}
                       className="capitalize"
                     >
