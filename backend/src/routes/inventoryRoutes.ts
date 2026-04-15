@@ -4,12 +4,15 @@ import {
   importProductInventory,
   createInventoryProduct,
   getInventoryProducts,
+  getInventoryProductById,
+  updateInventoryProduct,
+  deleteInventoryProduct,
 } from "../controllers/inventoryControllers.js";
 
 const router: Router = express.Router();
 
 router.post(
-  "/import/:productId",
+  "/:productId/import",
   protectAuth,
   restrictTo("admin", "owner"),
   importProductInventory,
@@ -20,6 +23,19 @@ router.post(
   restrictTo("admin", "owner"),
   createInventoryProduct,
 );
+router.put(
+  "/:productId",
+  protectAuth,
+  restrictTo("admin", "owner"),
+  updateInventoryProduct,
+);
 router.get("/", protectAuth, getInventoryProducts);
+router.get("/:productId", protectAuth, getInventoryProductById);
+router.delete(
+  "/:productId",
+  protectAuth,
+  restrictTo("admin", "owner"),
+  deleteInventoryProduct,
+);
 
 export default router;
