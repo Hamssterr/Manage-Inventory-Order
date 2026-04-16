@@ -1,10 +1,10 @@
-import type { BaseListResponse } from "./pagination";
+import type { BaseListResponse, BaseResponse } from "./pagination";
 import type { IUserInfo } from "./user";
 
 interface IMiniProduct {
   _id: string;
   name: string;
-  sku: string;
+  sku?: string;
   baseUnit?: string;
 }
 
@@ -16,7 +16,7 @@ export interface IProductUnit {
 }
 
 interface IProductComponent {
-  productId: IMiniProduct;
+  productId: IMiniProduct | string;
   quantityPerBaseUnit: number;
 }
 
@@ -57,3 +57,23 @@ export interface ProductParams {
 }
 
 export type GetProductResponse = BaseListResponse<IProduct>;
+
+export type IAddProductRequest = Pick<
+  IProduct,
+  "name" | "sku" | "category" | "baseUnit" | "isSale" | "units"
+> & {
+  components: {
+    productId: string;
+    quantityPerBaseUnit: number;
+  }[];
+};
+
+export type AddProductResponse = BaseListResponse<IProduct>;
+
+export type IUpdateProductRequest = Partial<IAddProductRequest>;
+
+export type UpdateProductResponse = BaseListResponse<IProduct>;
+
+export type GetProductDetailResponse = BaseListResponse<IProduct>;
+
+export type DeleteProductResponse = BaseResponse;

@@ -12,7 +12,7 @@ export const navigationConfig: NavigationConfig = {
       title: "Sản phẩm",
       url: "/products",
       icon: "Package",
-      roles: ["admin", "owner"],
+      roles: ["admin", "owner", "accountant", "salers"],
       items: [{ title: "Danh sách sản phẩm", url: "/products" }],
     },
     {

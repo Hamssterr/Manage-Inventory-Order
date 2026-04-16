@@ -9,6 +9,8 @@ import { PublicRoute } from "./components/guard/PublicRoute";
 import { RoleRoute } from "./components/guard/RoleRoute";
 import { InventoryPage } from "./pages/Inventory";
 import { InventoryModal } from "./pages/Inventory/inventory-modal";
+import { ProductPage } from "./pages/Product";
+import { ProductModal } from "./pages/Product/product-modal";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -52,11 +54,18 @@ export const AppRoutes = () => {
                 />
               ),
               children: [
+                // Inventory
                 { path: "inventory", element: <InventoryPage /> },
                 { path: "inventory/add", element: <InventoryModal /> },
                 { path: "inventory/:id", element: <InventoryModal /> },
                 { path: "inventory/:id/edit", element: <InventoryModal /> },
                 { path: "inventory/:id/import", element: <InventoryModal /> },
+
+                // Product
+                { path: "products", element: <ProductPage /> },
+                { path: "products/add", element: <ProductModal /> },
+                { path: "products/:id", element: <ProductModal /> },
+                { path: "products/:id/edit", element: <ProductModal /> },
               ],
             },
 

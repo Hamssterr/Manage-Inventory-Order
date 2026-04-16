@@ -2,8 +2,9 @@ import express, { Router } from "express";
 import {
   getProductDetail,
   getSaleProducts,
-  updateProduct,
+  updateSaleProduct,
   createSaleProduct,
+  deleteSaleProduct,
 } from "../controllers/productControllers.js";
 import { protectAuth, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -21,7 +22,14 @@ router.put(
   "/:productId",
   protectAuth,
   restrictTo("admin", "owner"),
-  updateProduct,
+  updateSaleProduct,
+);
+
+router.delete(
+  "/:productId",
+  protectAuth,
+  restrictTo("admin", "owner"),
+  deleteSaleProduct,
 );
 
 export default router;

@@ -28,31 +28,37 @@ export interface IProduct extends Document {
   updatedAt: Date;
 }
 
-const ProductUnitSchema = new Schema<IProductUnit>({
-  unitName: {
-    type: String,
-    required: true,
-    trim: true,
+const ProductUnitSchema = new Schema<IProductUnit>(
+  {
+    unitName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    exchangeValue: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    priceDefault: {
+      type: Number,
+      default: 0,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
-  exchangeValue: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-  priceDefault: {
-    type: Number,
-    default: 0,
-  },
-  isDefault: {
-    type: Boolean,
-    default: false,
-  },
-});
+  { _id: false },
+);
 
-const ProductComponentSchema = new Schema<IProductComponent>({
-  productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-  quantityPerBaseUnit: { type: Number, required: true, min: 1 },
-});
+const ProductComponentSchema = new Schema<IProductComponent>(
+  {
+    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    quantityPerBaseUnit: { type: Number, required: true, min: 1 },
+  },
+  { _id: false },
+);
 
 const ProductSchema = new Schema<IProduct>(
   {

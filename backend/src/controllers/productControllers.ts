@@ -148,43 +148,43 @@ export const getSaleProducts = asyncWrapper(
   },
 );
 
-export const getProductList = asyncWrapper(
-  async (req: Request, res: Response) => {
-    const { page, limit, skip } = getPaginationParams(req);
+// export const getProductList = asyncWrapper(
+//   async (req: Request, res: Response) => {
+//     const { page, limit, skip } = getPaginationParams(req);
 
-    const products = await Product.aggregate([
-      {
-        $lookup: {
-          from: "stocks",
-          localField: "_id",
-          foreignField: "productId",
-          as: "stockInfo",
-        },
-      },
-      { $unwind: { path: "$stockInfo", preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          name: 1,
-          sku: 1,
-          units: 1, // Trả về toàn bộ mảng units để kế toán chọn đơn vị nhập
-          baseUnit: 1,
-          totalBaseQuantity: { $ifNull: ["$stockInfo.totalQuantity", 0] },
-          createdAt: 1,
-        },
-      },
-      { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
-    ]);
+//     const products = await Product.aggregate([
+//       {
+//         $lookup: {
+//           from: "stocks",
+//           localField: "_id",
+//           foreignField: "productId",
+//           as: "stockInfo",
+//         },
+//       },
+//       { $unwind: { path: "$stockInfo", preserveNullAndEmptyArrays: true } },
+//       {
+//         $project: {
+//           name: 1,
+//           sku: 1,
+//           units: 1, // Trả về toàn bộ mảng units để kế toán chọn đơn vị nhập
+//           baseUnit: 1,
+//           totalBaseQuantity: { $ifNull: ["$stockInfo.totalQuantity", 0] },
+//           createdAt: 1,
+//         },
+//       },
+//       { $sort: { createdAt: -1 } },
+//       { $skip: skip },
+//       { $limit: limit },
+//     ]);
 
-    const totalItems = await Product.countDocuments();
+//     const totalItems = await Product.countDocuments();
 
-    res.status(200).json({
-      success: true,
-      ...formatPaginationResponse(products, totalItems, page, limit),
-    });
-  },
-);
+//     res.status(200).json({
+//       success: true,
+//       ...formatPaginationResponse(products, totalItems, page, limit),
+//     });
+//   },
+// );
 
 export const getProductDetail = asyncWrapper(
   async (req: Request, res: Response) => {
@@ -219,89 +219,135 @@ export const getProductDetail = asyncWrapper(
   },
 );
 
-export const updateProduct = asyncWrapper(
+export const updateSaleProduct = asyncWrapper(
   async (req: AuthRequest, res: Response) => {
     const { productId } = req.params;
-    const {
-      name,
-      category,
-      units,
-      baseUnit,
-      isSale,
-      isGift,
-      isCombo,
-      components,
-    } = req.body;
-    const userId = req.user?._id;
+    const { name, sku, units, baseUnit, category, isSale, components } =
+      req.body;
+    const userId = req?.user?._id;
 
-    // 1. Tìm sản phẩm hiện tại trong DB
-    const currentProduct = await Product.findById(productId);
-    if (!currentProduct) {
-      throw new ErrorResponse("Product not found", 404);
-    }
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    // 2. Nếu người dùng cập nhật danh sách Units
-    if (units) {
-      const hasBaseUnit = units.some(
-        (u: any) =>
-          u.unitName.toLowerCase() === baseUnit.toLowerCase() &&
-          u.exchangeValue === 1,
+    try {
+      const product = await Product.findOne({
+        _id: productId,
+        isCombo: true,
+      }).session(session);
+      if (!product) {
+        throw new ErrorResponse("Không tìm thấy sản phẩm", 404);
+      }
+
+      const normalizedSku = sku.trim().toUpperCase();
+      const existingSku = await Product.findOne({
+        sku: normalizedSku,
+        _id: { $ne: product._id },
+      }).session(session);
+      if (existingSku) {
+        throw new ErrorResponse(`Sku code ${normalizedSku} đã tồn tại`, 400);
+      }
+
+      if (!Array.isArray(components) || components.length === 0) {
+        throw new ErrorResponse("Vật phẩm con cần ít nhất 1 sản phẩm", 400);
+      }
+
+      const componentIds = components.map(
+        (c: any) => new mongoose.Types.ObjectId(c.productId),
       );
-      if (!hasBaseUnit) {
+
+      const validProductCount = await Product.countDocuments({
+        _id: { $in: componentIds },
+        isCombo: false,
+      }).session(session);
+
+      if (validProductCount !== components.length) {
+        throw new ErrorResponse("Vật phẩm con không hợp lệ", 400);
+      }
+
+      const processedUnits = units.map((u: any) => ({
+        unitName: u.unitName.trim().toLowerCase(),
+        exchangeValue: Number(u.exchangeValue),
+        priceDefault: Number(u.priceDefault || 0),
+        isDefault: Boolean(u.isDefault || u.isDefalut),
+      }));
+
+      const baseUnitName = baseUnit.trim().toLowerCase();
+      const baseUnitInList = processedUnits.find(
+        (u: any) => u.unitName === baseUnitName && u.exchangeValue === 1,
+      );
+
+      if (!baseUnitInList) {
         throw new ErrorResponse(
-          `The unit [${baseUnit}] must be in the list of units with an exchange value of 1.`,
+          `Đơn vị cơ bản [${baseUnitName}] phải có trong danh sách đơn vị với giá trị quy đổi là 1`,
           400,
         );
       }
 
-      // Kiểm tra rủi ro tồn kho
-      const currentStock = await Stock.findOne({ productId });
-      if (currentStock && currentStock.totalQuantity > 0) {
-        // So sánh exchangeValue của các đơn vị cũ và mới
-        for (const oldUnit of currentProduct.units) {
-          const newUnit = units.find(
-            (u: any) =>
-              u.unitName.toLowerCase() === oldUnit.unitName.toLowerCase(),
-          );
-          if (newUnit && newUnit.exchangeValue !== oldUnit.exchangeValue) {
-            throw new ErrorResponse(
-              "Can not change exchange value if product has stock",
-              400,
-            );
-          }
-        }
+      const defaultUnits = processedUnits.filter((u: any) => u.isDefault);
+      if (defaultUnits.length > 1) {
+        throw new ErrorResponse("Phải chọn đúng 1 đơn vị mặc định", 400);
       }
+      if (defaultUnits.length === 0) {
+        processedUnits.find(
+          (u: any) => u.unitName === baseUnitName,
+        )!.isDefault = true;
+      }
+
+      product.name = name.trim();
+      product.sku = normalizedSku;
+      product.category = category;
+      product.baseUnit = baseUnitName;
+      product.isSale = isSale ?? product.isSale;
+
+      // Ghi đè hoàn toàn mảng components và units mới
+      product.components = components;
+      product.units = processedUnits;
+
+      if (userId) {
+        product.updatedBy = userId as mongoose.Types.ObjectId;
+      }
+
+      await product.save({ session });
+      await session.commitTransaction();
+      res.status(200).json({
+        success: true,
+        message: "Update combo product successfully",
+        data: product,
+      });
+    } catch (error: any) {
+      await session.abortTransaction();
+      throw new ErrorResponse(error.message, error.statusCode || 500);
+    } finally {
+      session.endSession();
     }
+  },
+);
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      productId,
-      {
-        $set: {
-          name,
-          category,
-          units,
-          baseUnit: baseUnit?.toLowerCase(),
-          isSale,
-          isGift,
-          isCombo:
-            isCombo !== undefined ? Boolean(isCombo) : currentProduct.isCombo,
-          components:
-            isCombo && Array.isArray(components)
-              ? components
-              : currentProduct.components,
-          updatedBy: userId,
-        },
-      },
-      { new: true, runValidators: true },
-    );
+export const deleteSaleProduct = asyncWrapper(
+  async (req: AuthRequest, res: Response) => {
+    const { productId } = req.params;
 
-    if (!updatedProduct) {
-      throw new ErrorResponse("Product not found", 404);
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const product = await Product.findById(productId).session(session);
+      if (!product) {
+        throw new ErrorResponse("Không tìm thấy sản phẩm", 404);
+      }
+
+      await Product.findByIdAndDelete(productId, { session });
+
+      await session.commitTransaction();
+      res.status(200).json({
+        success: true,
+        message: "Đã xóa sản phẩm thành công",
+      });
+    } catch (error: any) {
+      await session.abortTransaction();
+      throw new ErrorResponse(error.message, error.statusCode || 500);
+    } finally {
+      session.endSession();
     }
-
-    res.status(200).json({
-      message: "Update product successfully",
-      data: updatedProduct,
-    });
   },
 );

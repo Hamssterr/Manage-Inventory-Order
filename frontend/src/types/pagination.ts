@@ -17,3 +17,8 @@ export interface BaseDetailResponse<T> {
   data: T;
   message?: string;
 }
+
+export interface BaseResponse {
+  success: boolean;
+  message?: string;
+}
