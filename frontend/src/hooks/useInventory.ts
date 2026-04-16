@@ -1,5 +1,4 @@
 import { QUERY_KEYS } from "@/constants/query-key";
-import { queryClient } from "@/lib/queryClient";
 import type {
   ImportInventoryFormValues,
   InventoryFormValues,
@@ -15,15 +14,25 @@ import type {
   ICreateInventoryPayload,
   IImportInventoryRequest,
   InventoryParams,
+  GetInventoryListProduct,
 } from "@/types/inventory";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-export const useGetInventoryProducts = (params?: InventoryParams) => {
+export const useGetInventoryProducts = (
+  params?: InventoryParams,
+  options?: Omit<UseQueryOptions<GetInventoryListProduct, Error, GetInventoryListProduct, any[]>, "queryKey" | "queryFn">,
+) => {
   return useQuery({
     queryKey: [QUERY_KEYS.INVENTORY_PRODUCTS, params],
     queryFn: () => getInventoryProduct(params).then((res) => res.data),
+    ...options,
   });
 };
 
@@ -37,7 +46,7 @@ export const useCreateInventoryProducts = () => {
       });
     },
     onError: (error) => {
-      console.log("Error creating product:", error);
+      console.log("Error creating product inventory:", error);
     },
   });
 };

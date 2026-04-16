@@ -74,7 +74,7 @@ export const InfoCard = () => {
                   >
                     <SelectValue placeholder="Chọn danh mục" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     {CATEGORY_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}
@@ -107,7 +107,7 @@ export const InfoCard = () => {
                 >
                   <SelectValue placeholder="Chọn đơn vị tính" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper">
                   {BASE_UNIT_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}

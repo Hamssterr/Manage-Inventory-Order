@@ -170,66 +170,68 @@ export const InventoryPage = () => {
         }
         filters={filters}
       />
-      <div className="flex flex-col h-full bg-white rounded-xl border overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {isLoading ? (
-            <TableLoading />
-          ) : isError ? (
-            <TableError onRetry={() => refetch()} />
-          ) : (
-            <TableData
-              data={products}
-              columns={columns}
-              onView={(row) =>
-                navigate(`/inventory/${row._id}`, { state: { product: row } })
-              }
-              onUpdate={(row) =>
-                navigate(`/inventory/${row._id}/edit`, {
-                  state: { product: row },
-                })
-              }
-              onImport={(row) =>
-                navigate(`/inventory/${row._id}/import`, {
-                  state: { product: row },
-                })
-              }
-              onDelete={(row) => setProductToDelete(row)}
-            />
-          )}
+      <div className="p-2 h-screen flex flex-col">
+        <div className="flex flex-1 flex-col bg-white rounded-xl border overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {isLoading ? (
+              <TableLoading />
+            ) : isError ? (
+              <TableError onRetry={() => refetch()} />
+            ) : (
+              <TableData
+                data={products}
+                columns={columns}
+                onView={(row) =>
+                  navigate(`/inventory/${row._id}`, { state: { product: row } })
+                }
+                onUpdate={(row) =>
+                  navigate(`/inventory/${row._id}/edit`, {
+                    state: { product: row },
+                  })
+                }
+                onImport={(row) =>
+                  navigate(`/inventory/${row._id}/import`, {
+                    state: { product: row },
+                  })
+                }
+                onDelete={(row) => setProductToDelete(row)}
+              />
+            )}
+          </div>
+
+          <PageFooter>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Hiển thị</span>
+              <span className="font-medium text-foreground">
+                {startItem} - {endItem}
+              </span>
+              <span>trên</span>
+              <span className="font-medium text-foreground">{totalItems}</span>
+              <span>kết quả</span>
+            </div>
+
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1"
+                onClick={handlePrev}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1"
+                onClick={handleNext}
+                disabled={currentPage >= totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </PageFooter>
         </div>
-
-        <PageFooter>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Hiển thị</span>
-            <span className="font-medium text-foreground">
-              {startItem} - {endItem}
-            </span>
-            <span>trên</span>
-            <span className="font-medium text-foreground">{totalItems}</span>
-            <span>kết quả</span>
-          </div>
-
-          <div className="flex gap-2 items-center">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1"
-              onClick={handlePrev}
-              disabled={currentPage <= 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1"
-              onClick={handleNext}
-              disabled={currentPage >= totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </PageFooter>
       </div>
 
       <AlertDialog
@@ -243,21 +245,20 @@ export const InventoryPage = () => {
             <AlertDialogTitle>Xóa sản phẩm</AlertDialogTitle>
             <AlertDialogDescription>
               Bạn có chắc chắn muốn xóa sản phẩm này?
-
               {productToDelete && (
-            <div className="text-sm">
-              <p className="font-bold text-base text-foreground mb-1">
-                {productToDelete.name}
-              </p>
-              <p className="font-medium text-destructive text-xs">
-                * Hành động này không thể hoàn tác và có thể ảnh hưởng đến dữ
-                liệu liên quan.
-              </p>
-            </div>
-          )}
+                <div className="text-sm">
+                  <p className="font-bold text-base text-foreground mb-1">
+                    {productToDelete.name}
+                  </p>
+                  <p className="font-medium text-destructive text-xs">
+                    * Hành động này không thể hoàn tác và có thể ảnh hưởng đến
+                    dữ liệu liên quan.
+                  </p>
+                </div>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
+
           <AlertDialogFooter>
             <Button
               variant="outline"

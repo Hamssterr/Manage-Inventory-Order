@@ -13,7 +13,7 @@ export const Layout = () => {
           {/* <Navbar /> */}
 
           {/* Content - Page */}
-          <main className="p-2 flex-1 flex flex-col bg-background relative overflow-hidden">
+          <main className="flex-1 flex flex-col bg-background relative overflow-hidden overscroll-x-none w-full min-w-0">
             <Outlet />
           </main>
 

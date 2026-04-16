@@ -87,7 +87,7 @@ export const UnitsCard = () => {
                     >
                       <SelectValue placeholder="Chọn..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper">
                       {BASE_UNIT_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
@@ -143,11 +143,17 @@ export const UnitsCard = () => {
             </div>
 
             <div className="col-span-2 flex justify-center mt-3">
-              <input
-                type="radio"
-                className="h-4 w-4 cursor-pointer accent-primary"
-                checked={field.isDefault}
-                onChange={() => handleSetDefault(index)}
+              <Controller
+                control={control}
+                name={`units.${index}.isDefault`}
+                render={({ field: { value } }) => (
+                  <input
+                    type="radio"
+                    className="h-4 w-4 cursor-pointer accent-primary"
+                    checked={!!value}
+                    onChange={() => handleSetDefault(index)}
+                  />
+                )}
               />
             </div>
 

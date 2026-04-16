@@ -71,7 +71,7 @@ export function TableData<T extends { id: string | number }>({
                 className="hover:bg-muted/50 transition-colors"
               >
                 {/* Action column */}
-                <TableCell className="align-top py-4">
+                <TableCell className="align-middle py-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -123,7 +123,7 @@ export function TableData<T extends { id: string | number }>({
                 {columns.map((column, index) => (
                   <TableCell
                     key={index}
-                    className={(cn("align-top py-4"), column.className)}
+                    className={cn("align-middle py-4", column.className)}
                   >
                     {column.cell
                       ? column.cell(row)
