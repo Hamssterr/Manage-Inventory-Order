@@ -11,6 +11,10 @@ import { InventoryPage } from "./pages/Inventory";
 import { InventoryModal } from "./pages/Inventory/inventory-modal";
 import { ProductPage } from "./pages/Product";
 import { ProductModal } from "./pages/Product/product-modal";
+import { CustomerPage } from "./pages/Customer";
+import { CustomerModal } from "./pages/Customer/customer-modal";
+import { RoutePage } from "./pages/Route";
+import { RouteModal } from "./pages/Route/route-modal";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -66,6 +70,18 @@ export const AppRoutes = () => {
                 { path: "products/add", element: <ProductModal /> },
                 { path: "products/:id", element: <ProductModal /> },
                 { path: "products/:id/edit", element: <ProductModal /> },
+
+                // Customer
+                { path: "customers", element: <CustomerPage /> },
+                { path: "customers/add", element: <CustomerModal /> },
+                { path: "customers/:id", element: <CustomerModal /> },
+                { path: "customers/:id/edit", element: <CustomerModal /> },
+
+                // Route
+                { path: "routes", element: <RoutePage /> },
+                { path: "routes/add", element: <RouteModal /> },
+                { path: "routes/:id", element: <RouteModal /> },
+                { path: "routes/:id/edit", element: <RouteModal /> },
               ],
             },
 

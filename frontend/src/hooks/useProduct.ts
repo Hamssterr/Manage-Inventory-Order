@@ -7,6 +7,7 @@ import {
   updateProduct,
 } from "@/services/apis/product";
 import type {
+  GetProductResponse,
   IAddProductRequest,
   IUpdateProductRequest,
   ProductParams,
@@ -16,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const useGetProduct = (params: ProductParams) => {
-  return useQuery({
+  return useQuery<GetProductResponse>({
     queryKey: [QUERY_KEYS.PRODUCTS, params],
     queryFn: () => getProduct(params).then((res) => res.data),
   });

@@ -28,7 +28,7 @@ import {
   Package,
   ShoppingCart,
   Users,
-  Settings,
+  Navigation,
 } from "lucide-react";
 import { usePermission } from "@/hooks/usePermission";
 import { navigationConfig } from "@/constants/navigation";
@@ -38,7 +38,7 @@ const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Package,
   ShoppingCart,
   Users,
-  Settings,
+  Navigation,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

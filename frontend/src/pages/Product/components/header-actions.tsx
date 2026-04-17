@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Save, X } from "lucide-react";
 
 interface HeaderActionsProps {
   isPending: boolean;
@@ -23,13 +24,13 @@ export const HeaderActions = ({
   isViewMode,
   isEditMode,
 }: HeaderActionsProps) => {
-  const getPageTitle = () => {
+  const getTitle = () => {
     if (isEditMode) return "Cập nhật sản phẩm";
     if (isViewMode) return "Chi tiết sản phẩm";
     return "Thêm mới sản phẩm";
   };
   return (
-    <div className="flex items-center gap-2 border-b bg-white p-2 sticky top-0 z-10">
+    <div className="flex items-center gap-2 border-b bg-white p-2 sticky top-0 z-10 shadow-sm sm:px-4">
       <SidebarTrigger />
       <Separator orientation="vertical" className="mr-2 h-10" />
       <Breadcrumb>
@@ -39,7 +40,9 @@ export const HeaderActions = ({
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden md:block" />
           <BreadcrumbItem>
-            <BreadcrumbPage>{getPageTitle()}</BreadcrumbPage>
+            <BreadcrumbPage className="font-semibold text-primary">
+              {getTitle()}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -47,14 +50,29 @@ export const HeaderActions = ({
         <Button
           type="button"
           variant="outline"
+          size="sm"
           onClick={onCancel}
           disabled={isPending}
+          className="h-9 px-4 lg:px-6"
         >
+          <X className="h-4 w-4 mr-2" />
           {isViewMode ? "Quay lại" : "Hủy bỏ"}
         </Button>
         {!isViewMode && (
-          <Button type="submit" disabled={isPending}>
-            {isPending ? "Đang lưu..." : "Lưu lại"}
+          <Button
+            type="submit"
+            size="sm"
+            disabled={isPending}
+            className="h-9 px-4 lg:px-6 shadow-md shadow-primary/20"
+          >
+            {isPending ? (
+              "Đang lưu..."
+            ) : (
+              <span className="flex items-center">
+                <Save className="h-4 w-4 mr-2" />
+                Lưu sản phẩm
+              </span>
+            )}
           </Button>
         )}
       </div>

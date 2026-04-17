@@ -6,7 +6,7 @@ export const StatusCard = () => {
   const { control } = useFormContext<InventoryFormValues>();
 
   return (
-    <div className="border rounded shadow-sm bg-white">
+    <div className="border rounded-xl shadow-sm bg-white">
       <div className="flex flex-col bg-gray-100 p-3 rounded-t">
         <p className="font-bold text-md">Trạng thái</p>
         <p className="text-muted-foreground text-xs">Cấu hình bán hàng</p>

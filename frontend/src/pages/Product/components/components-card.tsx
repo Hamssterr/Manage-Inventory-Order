@@ -9,9 +9,6 @@ import { useLocation } from "react-router-dom";
 import type { IProduct } from "@/types/product";
 import { useDebounce } from "@/hooks/useDebounce";
 
-// ---------------------------------------------------------
-// Component Tối Ưu: ProductSearchSelect
-// ---------------------------------------------------------
 const ProductSearchSelect = ({
   value,
   onChange,
@@ -21,7 +18,7 @@ const ProductSearchSelect = ({
   value: string;
   onChange: (val: string) => void;
   error?: boolean;
-  initialProductInfo?: { name: string; sku: string; baseUnit: string };
+  initialProductInfo?: { name: string; baseUnit: string };
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -31,11 +28,11 @@ const ProductSearchSelect = ({
   // Tối ưu 1: State giữ cứng tên hiển thị, tránh bị mất khi API refetch
   const [displayLabel, setDisplayLabel] = useState<string>(
     initialProductInfo
-      ? `[${initialProductInfo.sku}] ${initialProductInfo.name} (${initialProductInfo.baseUnit})`
+      ? ` ${initialProductInfo.name} (${initialProductInfo.baseUnit})`
       : "Tìm kiếm sản phẩm...",
   );
 
-  // Click outside
+  // Click outside and close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -59,10 +56,11 @@ const ProductSearchSelect = ({
   const productOptions = inventoryData?.data || [];
 
   const handleSelect = (opt: IProduct) => {
-    onChange(opt._id); // Gửi ID lên Form
-    setDisplayLabel(`[${opt.sku}] ${opt.name} (${opt.baseUnit})`); // Cập nhật nhãn
-    setIsOpen(false); // Đóng menu
-    setSearch(""); // Reset search
+    onChange(opt._id);
+    setDisplayLabel(`
+       ${opt.name} (${opt.baseUnit})`);
+    setIsOpen(false);
+    setSearch("");
   };
 
   return (
@@ -111,8 +109,8 @@ const ProductSearchSelect = ({
                   }`}
                 >
                   <span className="truncate">
-                    <span className="font-semibold mr-1">[{opt.sku}]</span>
-                    {opt.name} ({opt.baseUnit})
+                    <span className="font-semibold mr-1">{opt.name}</span>(
+                    {opt.baseUnit})
                   </span>
                 </div>
               ))
@@ -124,9 +122,6 @@ const ProductSearchSelect = ({
   );
 };
 
-// ---------------------------------------------------------
-// Component Chính: ComponentsCard
-// ---------------------------------------------------------
 export const ComponentsCard = () => {
   const location = useLocation();
   const originProduct = location?.state?.product as IProduct | undefined;
@@ -143,7 +138,7 @@ export const ComponentsCard = () => {
   });
 
   return (
-    <div className="border rounded shadow-sm bg-white">
+    <div className="border rounded-xl shadow-sm bg-white">
       {/* HEADER TƯƠNG TỰ */}
       <div className="flex items-center justify-between bg-gray-100 p-3 rounded-t">
         <div>
@@ -180,7 +175,7 @@ export const ComponentsCard = () => {
           // Tính toán initial data 1 lần duy nhất để đẩy xuống
           const originComponent = originProduct?.components?.[index];
           let initialProductInfo:
-            | { name: string; sku: string; baseUnit: string }
+            | { name: string; baseUnit: string }
             | undefined;
 
           if (
@@ -190,7 +185,6 @@ export const ComponentsCard = () => {
             const p = originComponent.productId as any;
             initialProductInfo = {
               name: p.name,
-              sku: p.sku,
               baseUnit: p.baseUnit || "",
             };
           }

@@ -36,7 +36,7 @@ export const UnitsCard = () => {
   };
 
   return (
-    <div className="border rounded shadow-sm bg-white">
+    <div className="border rounded-xl shadow-sm bg-white">
       <div className="flex items-center justify-between bg-gray-100 p-3 rounded-t">
         <div>
           <p className="font-bold text-md">Thiết lập đơn vị</p>

@@ -16,3 +16,19 @@ export const GetProduct = "products/";
 export const AddProduct = "products/add";
 export const UpdateProduct = "products/";
 export const DeleteProduct = "products/";
+
+// Customer
+export const GetAllCustomer = "customers/";
+export const CreateCustomer = "customers/add";
+export const UpdateCustomer = "customers/";
+export const DeleteCustomer = "customers/";
+
+// Route
+export const GetAllRoute = "routes/";
+export const CreateRoute = "routes/add";
+export const UpdateRoute = "routes/";
+export const DeleteRoute = "routes/";
+
+// User
+export const GetAllUsers = "users/";
+export const GetSalers = "users/salers";

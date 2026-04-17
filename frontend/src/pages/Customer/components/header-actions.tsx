@@ -16,7 +16,6 @@ interface HeaderActionsProps {
   onCancel: () => void;
   isViewMode?: boolean;
   isEditMode?: boolean;
-  isImportMode?: boolean;
 }
 
 export const HeaderActions = ({
@@ -24,13 +23,11 @@ export const HeaderActions = ({
   onCancel,
   isViewMode,
   isEditMode,
-  isImportMode,
 }: HeaderActionsProps) => {
   const getTitle = () => {
-    if (isViewMode) return "Chi tiết sản phẩm";
-    if (isEditMode) return "Cập nhật sản phẩm";
-    if (isImportMode) return "Nhập kho";
-    return "Thêm mới sản phẩm";
+    if (isEditMode) return "Cập nhật khách hàng";
+    if (isViewMode) return "Chi tiết khách hàng";
+    return "Thêm mới khách hàng";
   };
 
   return (
@@ -40,7 +37,9 @@ export const HeaderActions = ({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem className="hidden md:block">
-            <BreadcrumbLink href="/inventory">Danh sách tồn kho</BreadcrumbLink>
+            <BreadcrumbLink href="/customers">
+              Danh sách khách hàng
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden md:block" />
           <BreadcrumbItem>
@@ -74,7 +73,7 @@ export const HeaderActions = ({
             ) : (
               <span className="flex items-center">
                 <Save className="h-4 w-4 mr-2" />
-                Lưu sản phẩm
+                Lưu khách hàng
               </span>
             )}
           </Button>

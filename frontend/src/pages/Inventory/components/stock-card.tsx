@@ -8,7 +8,7 @@ interface StockCardProps {
 export const StockCard = ({ isViewMode, product }: StockCardProps) => {
   if (!isViewMode || !product) return null;
   return (
-    <div className="border rounded shadow-sm bg-white">
+    <div className="border rounded-xl shadow-sm bg-white">
       <div className="flex flex-col bg-gray-100 p-3 rounded-t">
         <p className="font-bold text-md">Thông tin kho</p>
         <p className="text-muted-foreground text-xs">
@@ -36,5 +36,5 @@ export const StockCard = ({ isViewMode, product }: StockCardProps) => {
         </div>
       </div>
     </div>
-  );
+  );  
 };
