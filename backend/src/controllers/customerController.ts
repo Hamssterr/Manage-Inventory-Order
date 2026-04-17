@@ -25,8 +25,8 @@ export const createCustomer = asyncWrapper(
       name: name.trim(),
       taxCode: taxCode || "NOT_PROVIDED",
       phoneNumber: phoneNumber.trim(),
-      addresses: addresses || [],
-      saleRep: saleRep || userId,
+      addresses: addresses,
+      saleRep: saleRep || undefined,
       createdBy: userId,
       updatedBy: userId,
     });

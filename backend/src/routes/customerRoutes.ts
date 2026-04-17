@@ -11,7 +11,7 @@ import {
 const router: Router = express.Router();
 
 router.post(
-  "/",
+  "/add",
   protectAuth,
   restrictTo("admin", "owner", "sale"),
   createCustomer,

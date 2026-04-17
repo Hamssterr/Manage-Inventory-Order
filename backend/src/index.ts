@@ -9,6 +9,7 @@ import inventoryRoutes from "./routes/inventoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import routeRoutes from "./routes/routeRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/routes", routeRoutes);
+app.use("/api/users", userRoutes);
 app.use(errorHandler);
 
 connectDB().then(() => {

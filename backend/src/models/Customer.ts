@@ -7,14 +7,13 @@ export interface IAddress {
   district: string;
   province: string;
   routeId?: mongoose.Types.ObjectId;
-  isDefalut: boolean;
 }
 
 export interface ICustomer extends Document {
   taxCode?: string;
   name: string;
   phoneNumber: string;
-  addresses: IAddress[];
+  addresses: IAddress;
   saleRep: mongoose.Types.ObjectId; //Nhân viên phụ trách khách hàng
   createdBy: mongoose.Types.ObjectId;
   updatedBy: mongoose.Types.ObjectId;
@@ -23,7 +22,7 @@ export interface ICustomer extends Document {
 }
 
 const AddressSchema = new Schema<IAddress>({
-  addressDetail: {
+  addressDetail: {  
     type: String,
     required: true,
   },
@@ -42,10 +41,6 @@ const AddressSchema = new Schema<IAddress>({
   routeId: {
     type: Schema.Types.ObjectId,
     ref: "Route",
-  },
-  isDefalut: {
-    type: Boolean,
-    default: false,
   },
 });
 
@@ -66,7 +61,7 @@ const CustomerSchema = new Schema<ICustomer>(
       required: true,
       trim: true,
     },
-    addresses: [AddressSchema],
+    addresses: AddressSchema,
 
     saleRep: {
       type: Schema.Types.ObjectId,
