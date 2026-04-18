@@ -33,7 +33,7 @@ export const CustomerModal = () => {
       name: "",
       phoneNumber: "",
       taxCode: "",
-      saleRep: "",
+      saleReps: [],
       addresses: {
         addressDetail: "",
         ward: "",
@@ -49,6 +49,12 @@ export const CustomerModal = () => {
   // Populate form when editing an existing customer
   useEffect(() => {
     if (originCustomer) {
+      const salesIds = Array.isArray(originCustomer.saleReps)
+        ? originCustomer.saleReps.map((item: any) =>
+            typeof item === "object" ? item._id : item,
+          )
+        : [];
+
       reset({
         name: originCustomer.name,
         phoneNumber: originCustomer.phoneNumber,
@@ -56,10 +62,7 @@ export const CustomerModal = () => {
           originCustomer.taxCode && originCustomer.taxCode !== "NOT_PROVIDED"
             ? originCustomer.taxCode
             : "",
-        saleRep:
-          typeof originCustomer.saleRep === "object"
-            ? (originCustomer.saleRep as any)._id
-            : originCustomer.saleRep || "",
+        saleReps: salesIds,
         addresses: {
           addressDetail: originCustomer.addresses?.addressDetail || "",
           ward: originCustomer.addresses?.ward || "",
@@ -79,7 +82,7 @@ export const CustomerModal = () => {
     const payload = {
       ...data,
       taxCode: data.taxCode || "NOT_PROVIDED",
-      saleRep: data.saleRep || undefined,
+      saleReps: data.saleReps,
       addresses: {
         ...data.addresses,
         routeId: data.addresses.routeId || undefined,
@@ -89,6 +92,11 @@ export const CustomerModal = () => {
   };
 
   const handleCancel = () => navigate("/customers");
+
+  const initialRouteName =
+    typeof originCustomer?.addresses?.routeId === "object"
+      ? (originCustomer.addresses.routeId as any)?.routeName
+      : undefined;
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
@@ -112,7 +120,10 @@ export const CustomerModal = () => {
               className="flex flex-col col-span-1 lg:col-span-8 space-y-4 lg:space-y-6 disabled:opacity-90"
             >
               <InfoCard />
-              <AddressCard disabled={isPending || isViewMode} />
+              <AddressCard
+                disabled={isPending || isViewMode}
+                initialRouteName={initialRouteName}
+              />
             </fieldset>
 
             {/* ── Metadata & Assignment (Right Column) ── */}
@@ -121,14 +132,7 @@ export const CustomerModal = () => {
                 disabled={isPending || isViewMode}
                 className="disabled:opacity-90 h-full"
               >
-                <SalesRepCard
-                  disabled={isPending || isViewMode}
-                  initialDisplay={
-                    typeof originCustomer?.saleRep === "object"
-                      ? (originCustomer.saleRep as any).displayName
-                      : undefined
-                  }
-                />
+                <SalesRepCard disabled={isPending || isViewMode} />
               </fieldset>
             </div>
           </div>

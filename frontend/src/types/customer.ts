@@ -30,7 +30,7 @@ export interface ICustomer {
   name: string;
   phoneNumber: string;
 
-  saleRep: ISaleRepMini | string;
+  saleReps: ISaleRepMini[] | string[];
   addresses: ICustomerAddress;
 
   createdBy: IUserInfo | string;
@@ -50,7 +50,7 @@ export interface ICreateCustomerRequest {
   name: string;
   taxCode?: string;
   phoneNumber: string;
-  saleRep?: string;
+  saleReps: string[];
   addresses: {
     addressDetail: string;
     ward: string;

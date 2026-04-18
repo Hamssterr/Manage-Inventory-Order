@@ -150,12 +150,23 @@ export const CustomerPage = () => {
       header: "Nhân viên phụ trách",
       className: "w-[200px]",
       cell: (row) => {
-        if (!row.saleRep) return <span className="text-slate-400">---</span>;
-        const repName =
-          typeof row.saleRep === "object"
-            ? (row.saleRep as ISaleRepMini).displayName
-            : "Đang tải...";
-        return <span className="font-medium">{repName}</span>;
+        const reps = Array.isArray(row.saleReps) ? row.saleReps : [];
+        if (reps.length === 0) return <span className="text-slate-400">---</span>;
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="font-medium">
+              {typeof reps[0] === "object"
+                ? (reps[0] as ISaleRepMini).displayName
+                : "Đang tải..."}
+            </span>
+            {reps.length > 1 && (
+              <span className="text-[10px] text-muted-foreground italic">
+                và {reps.length - 1} người khác
+              </span>
+            )}
+          </div>
+        );
       },
     },
     {

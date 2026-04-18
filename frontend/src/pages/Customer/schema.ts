@@ -11,7 +11,9 @@ export const customerSchema = z.object({
     province: z.string().min(1, "Tỉnh/Thành phố không được để trống"),
     routeId: z.string().optional(),
   }),
-  saleRep: z.string().optional(),
+  saleReps: z
+    .array(z.string())
+    .min(1, "Vui lòng chọn ít nhất một nhân viên phụ trách"),
 });
 
 export type CustomerFormValues = z.infer<typeof customerSchema>;

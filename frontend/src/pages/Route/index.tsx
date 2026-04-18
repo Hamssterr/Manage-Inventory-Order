@@ -158,7 +158,7 @@ export const RoutePage = () => {
         return (
           <div className="flex flex-col items-end gap-1">
             <div className="flex flex-wrap justify-end gap-1 max-w-[250px]">
-              {reps.map((rep, idx) => (
+              {reps.map((rep) => (
                 <span
                   key={rep._id}
                   className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-100"

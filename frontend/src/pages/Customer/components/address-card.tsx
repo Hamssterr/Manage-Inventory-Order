@@ -10,25 +10,60 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MapPin, Route as RouteIcon, Loader2 } from "lucide-react";
-import { useGetAllRouteQuery } from "@/hooks/useRoute";
+import { useGetInfiniteRouteQuery } from "@/hooks/useRoute";
 import type { CustomerFormValues } from "../schema";
+import { useMemo, useRef, useCallback } from "react";
 
 interface AddressCardProps {
   disabled?: boolean;
+  initialRouteName?: string;
 }
 
-export const AddressCard = ({ disabled }: AddressCardProps) => {
+export const AddressCard = ({
+  disabled,
+  initialRouteName,
+}: AddressCardProps) => {
   const {
     register,
     control,
     formState: { errors },
   } = useFormContext<CustomerFormValues>();
 
-  const { data: routeData, isLoading: isLoadingRoutes } = useGetAllRouteQuery({
-    limit: 100,
+  const {
+    data: routeData,
+    isLoading: isLoadingRoutes,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetInfiniteRouteQuery({
+    limit: 10,
   });
 
-  const routes = routeData?.data || [];
+  const routes = useMemo(() => {
+    return routeData?.pages.flatMap((page) => page.data) || [];
+  }, [routeData]);
+
+  // Infinite scroll observer
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingRoutes || isFetchingNextPage) return;
+
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasNextPage) {
+            fetchNextPage();
+          }
+        },
+        { rootMargin: "50px" },
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoadingRoutes, isFetchingNextPage, hasNextPage, fetchNextPage],
+  );
 
   return (
     <Card className="shadow-sm border-slate-200 overflow-hidden">
@@ -156,7 +191,9 @@ export const AddressCard = ({ disabled }: AddressCardProps) => {
                       </span>
                     ) : (
                       routes.find((r: any) => r._id === field.value)
-                        ?.routeName || "Chọn tuyến đường"
+                        ?.routeName ||
+                      initialRouteName ||
+                      "Chọn tuyến đường"
                     )}
                   </SelectValue>
                 </SelectTrigger>
@@ -166,9 +203,15 @@ export const AddressCard = ({ disabled }: AddressCardProps) => {
                   </SelectItem>
                   {routes.map((route: any) => (
                     <SelectItem key={route._id} value={route._id}>
-                      {route.routeName}
+                      {route.routeName} ({route.description})
                     </SelectItem>
                   ))}
+                  <div ref={lastElementRef} className="h-1" />
+                  {isFetchingNextPage && (
+                    <div className="flex items-center justify-center p-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             )}
