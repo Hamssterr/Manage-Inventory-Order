@@ -1,6 +1,7 @@
 import {
   useMutation,
   useQuery,
+  useInfiniteQuery,
   useQueryClient,
   type UseQueryOptions,
 } from "@tanstack/react-query";
@@ -29,6 +30,21 @@ export const useGetAllRouteQuery = (
     queryKey: [QUERY_KEYS.ROUTES, params],
     queryFn: () => getAllRoute(params).then((res) => res.data),
     ...options,
+  });
+};
+
+export const useGetInfiniteRouteQuery = (params: RouteParams) => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.ROUTES, "infinite", params],
+    queryFn: ({ pageParam = 1 }) =>
+      getAllRoute({ ...params, page: pageParam as number }).then(
+        (res) => res.data,
+      ),
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 };
 
