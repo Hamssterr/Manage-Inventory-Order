@@ -4,7 +4,7 @@ import { Schema, type Document } from "mongoose";
 export interface IRoute extends Document {
   routeName: string;
   description?: string;
-  responsibleSale: mongoose.Types.ObjectId;
+  responsibleSale: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,11 +19,13 @@ const RouteSchema = new Schema<IRoute>(
     description: {
       type: String,
     },
-    responsibleSale: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    responsibleSale: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
   },
   { timestamps: true },
 );
