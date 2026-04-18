@@ -14,7 +14,7 @@ export interface ICustomer extends Document {
   name: string;
   phoneNumber: string;
   addresses: IAddress;
-  saleRep: mongoose.Types.ObjectId; //Nhân viên phụ trách khách hàng
+  saleReps: mongoose.Types.ObjectId[]; //Nhân viên phụ trách khách hàng
   createdBy: mongoose.Types.ObjectId;
   updatedBy: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -22,7 +22,7 @@ export interface ICustomer extends Document {
 }
 
 const AddressSchema = new Schema<IAddress>({
-  addressDetail: {  
+  addressDetail: {
     type: String,
     required: true,
   },
@@ -63,11 +63,13 @@ const CustomerSchema = new Schema<ICustomer>(
     },
     addresses: AddressSchema,
 
-    saleRep: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    saleReps: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
 
     createdBy: {
       type: Schema.Types.ObjectId,
