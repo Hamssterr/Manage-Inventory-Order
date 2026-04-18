@@ -2,25 +2,24 @@ import { useFormContext, Controller } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Briefcase, UserCheck, Loader2 } from "lucide-react";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Briefcase, UserCheck, Loader2, Plus, X } from "lucide-react";
 import { useGetSalersQuery } from "@/hooks/useUser";
 import type { RouteFormValues } from "../schema";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface SalesRepCardProps {
   disabled?: boolean;
-  initialDisplay?: string;
 }
 
-export const SalesRepCard = ({
-  disabled,
-  initialDisplay,
-}: SalesRepCardProps) => {
+export const SalesRepCard = ({ disabled }: SalesRepCardProps) => {
   const {
     control,
     formState: { errors },
@@ -37,65 +36,127 @@ export const SalesRepCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 sm:p-6 space-y-4">
-        <div className="space-y-2">
-          <Label className="text-slate-700 font-medium flex items-center gap-2">
-            <UserCheck className="h-3.5 w-3.5 text-slate-500" />
-            Nhân viên phụ trách
-          </Label>
-          <Controller
-            control={control}
-            name="responsibleSale"
-            render={({ field }) => (
-              <Select
-                disabled={disabled}
-                value={field.value || "none"}
-                onValueChange={(val) =>
-                  field.onChange(val === "none" ? "" : val)
-                }
-              >
-                <SelectTrigger
-                  className={`w-full bg-white ${errors.responsibleSale ? "border-red-500" : ""}`}
-                >
-                  <SelectValue placeholder="Chọn nhân viên">
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        Đang tải...
-                      </span>
-                    ) : (
-                      salers?.find((u: any) => u._id === field.value)
-                        ?.displayName ||
-                      initialDisplay ||
-                      "Chọn nhân viên"
-                    )}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent position="popper" className="max-h-[300px]">
-                  <SelectItem value="none" className="text-slate-400 italic">
-                    Chưa phân công
-                  </SelectItem>
-                  {salers?.map((user: any) => (
-                    <SelectItem key={user._id} value={user._id}>
-                      <div className="flex flex-col py-0.5">
-                        <span className="font-medium text-sm">
-                          {user.displayName}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                          {user.role}
-                        </span>
+        <Controller
+          control={control}
+          name="responsibleSale"
+          render={({ field }) => {
+            const selectedIds = field.value || [];
+
+            const handleToggle = (id: string) => {
+              const newIds = selectedIds.includes(id)
+                ? selectedIds.filter((i: string) => i !== id)
+                : [...selectedIds, id];
+              field.onChange(newIds);
+            };
+
+            const removeId = (id: string) => {
+              field.onChange(selectedIds.filter((i: string) => i !== id));
+            };
+
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-slate-700 font-medium flex items-center gap-2">
+                    <UserCheck className="h-3.5 w-3.5 text-slate-500" />
+                    Nhân viên tiếp thị
+                  </Label>
+                  <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-bold uppercase tracking-wider">
+                    {selectedIds.length} đã chọn
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 min-h-[42px] p-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/30">
+                  {selectedIds.length === 0 ? (
+                    <span className="text-xs text-slate-400 italic flex items-center h-full ml-1">
+                      Chưa có nhân viên nào được chọn
+                    </span>
+                  ) : (
+                    selectedIds.map((id: string) => {
+                      const user = salers?.find((u: any) => u._id === id);
+                      return (
+                        <Badge
+                          key={id}
+                          variant="secondary"
+                          className="bg-white border-slate-200 text-slate-700 pr-1 pl-2 py-0.5 gap-1 group animate-in fade-in zoom-in duration-200"
+                        >
+                          <span className="max-w-[120px] truncate">
+                            {user?.displayName || "Đang tải..."}
+                          </span>
+                          {!disabled && (
+                            <button
+                              type="button"
+                              onClick={() => removeId(id)}
+                              className="hover:bg-slate-100 rounded-full p-0.5 transition-colors"
+                            >
+                              <X className="h-3 w-3 text-slate-400 group-hover:text-slate-600" />
+                            </button>
+                          )}
+                        </Badge>
+                      );
+                    })
+                  )}
+                </div>
+
+                {!disabled && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isLoading}
+                        className="w-full justify-start gap-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-normal"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        {isLoading
+                          ? "Đang tải danh sách..."
+                          : "Thêm nhân viên tiếp thị"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-[300px]">
+                      <DropdownMenuLabel className="text-[11px] font-bold text-slate-500 uppercase">
+                        Danh sách nhân viên
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <div className="max-h-[240px] overflow-y-auto">
+                        {salers?.map((user: any) => (
+                          <DropdownMenuCheckboxItem
+                            key={user._id}
+                            checked={selectedIds.includes(user._id)}
+                            onCheckedChange={() => handleToggle(user._id)}
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <div className="flex flex-col py-0.5">
+                              <span className="font-medium text-sm">
+                                {user.displayName}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground uppercase">
+                                {user.phoneNumber}
+                              </span>
+                            </div>
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        {salers?.length === 0 && (
+                          <div className="p-4 text-center text-xs text-slate-400">
+                            Không tìm thấy nhân viên
+                          </div>
+                        )}
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.responsibleSale && (
-            <p className="text-[11px] font-medium text-red-500 ml-1">
-              {errors.responsibleSale.message}
-            </p>
-          )}
-        </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
+            );
+          }}
+        />
+        {errors.responsibleSale && (
+          <p className="text-[11px] font-medium text-red-500 ml-1">
+            {errors.responsibleSale.message}
+          </p>
+        )}
 
         <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100 mt-2">
           <p className="text-[11px] text-blue-700 leading-relaxed font-medium">

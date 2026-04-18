@@ -15,7 +15,7 @@ export interface IRoute {
   routeName: string;
   description?: string;
 
-  responsibleSale: IRouteSaleRep | string;
+  responsibleSale: IRouteSaleRep[] | string[];
 
   createdAt: string;
   updatedAt: string;
@@ -31,7 +31,7 @@ export interface RouteParams {
 export interface ICreateRouteRequest {
   routeName: string;
   description?: string;
-  responsibleSale: string;
+  responsibleSale: string[];
 }
 
 export type CreateRouteResponse = BaseDetailResponse<IRoute>;

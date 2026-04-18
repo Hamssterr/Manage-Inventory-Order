@@ -148,20 +148,35 @@ export const RoutePage = () => {
       // Căn phải nhưng thêm padding-right đủ lớn để không dính lề
       className: "text-right pr-8 min-w-[200px]",
       cell: (row) => {
-        if (!row.responsibleSale)
+        const reps = Array.isArray(row.responsibleSale)
+          ? (row.responsibleSale as IRouteSaleRep[])
+          : [];
+
+        if (reps.length === 0)
           return <span className="text-slate-400 pr-4">Chưa chỉ định</span>;
 
-        const rep = row.responsibleSale as IRouteSaleRep;
         return (
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-900">
-                {rep.displayName}
-              </span>
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-wrap justify-end gap-1 max-w-[250px]">
+              {reps.map((rep, idx) => (
+                <span
+                  key={rep._id}
+                  className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-100"
+                >
+                  {rep.displayName}
+                </span>
+              ))}
             </div>
-            <span className="text-xs text-slate-500 font-mono">
-              {rep.phoneNumber}
-            </span>
+            {reps.length === 1 && (
+              <span className="text-[10px] text-slate-400 font-mono">
+                {reps[0].phoneNumber}
+              </span>
+            )}
+            {reps.length > 1 && (
+              <span className="text-[10px] text-slate-400 italic">
+                {reps.length} nhân sự
+              </span>
+            )}
           </div>
         );
       },

@@ -30,7 +30,7 @@ export const RouteModal = () => {
     defaultValues: {
       routeName: "",
       description: "",
-      responsibleSale: "",
+      responsibleSale: [],
     },
   });
 
@@ -38,13 +38,16 @@ export const RouteModal = () => {
 
   useEffect(() => {
     if (originRoute) {
+      const salesIds = Array.isArray(originRoute.responsibleSale)
+        ? originRoute.responsibleSale.map((item: any) =>
+            typeof item === "object" ? item._id : item,
+          )
+        : [];
+
       reset({
         routeName: originRoute.routeName,
         description: originRoute.description || "",
-        responsibleSale:
-          typeof originRoute.responsibleSale === "object"
-            ? (originRoute.responsibleSale as any)._id
-            : originRoute.responsibleSale || "",
+        responsibleSale: salesIds,
       });
     }
   }, [originRoute, reset]);
@@ -80,19 +83,7 @@ export const RouteModal = () => {
 
             {/* ── Metadata & Assignment (Right) ── */}
             <div className="col-span-1 lg:col-span-4">
-              <fieldset
-                disabled={isPending || isViewMode}
-                className="disabled:opacity-90 h-full"
-              >
-                <SalesRepCard
-                  disabled={isPending || isViewMode}
-                  initialDisplay={
-                    typeof originRoute?.responsibleSale === "object"
-                      ? (originRoute.responsibleSale as any)?.displayName
-                      : undefined
-                  }
-                />
-              </fieldset>
+              <SalesRepCard disabled={isViewMode} />
             </div>
           </div>
         </div>
