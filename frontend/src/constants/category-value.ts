@@ -3,6 +3,7 @@ export const CATEGORY_OPTIONS = [
   { label: "Bột giặt - Xà bông", value: "Bột giặt - Xà bông" },
   { label: "Nước giải khát", value: "Nước giải khát" },
   { label: "Đồ gia dụng", value: "Đồ gia dụng" },
+  { label: "Thực phẩm", value: "Thực phẩm" },
   { label: "Khác", value: "Khác" },
 ];
 
@@ -13,5 +14,6 @@ export const BASE_UNIT_OPTIONS = [
   { label: "Túi", value: "túi" },
   { label: "Thùng", value: "thùng" },
   { label: "Cái", value: "cái" },
+  { label: "Lon", value: "lon" },
   { label: "Khác", value: "khác" },
 ];

@@ -30,7 +30,7 @@ export const InventoryPage = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const limit = 15;
+  const limit = 10;
 
   const [productToDelete, setProductToDelete] = useState<IProduct | null>(null);
 

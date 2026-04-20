@@ -76,22 +76,31 @@ export const UnitsCard = () => {
                 control={control}
                 name={`units.${index}.unitName`}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger
-                      className={
-                        errors.units?.[index]?.unitName ? "border-red-500" : ""
-                      }
-                    >
-                      <SelectValue placeholder="Chọn..." />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {BASE_UNIT_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={
+                          errors.units?.[index]?.unitName
+                            ? "border-red-500"
+                            : ""
+                        }
+                      >
+                        <SelectValue placeholder="Chọn..." />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {BASE_UNIT_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.units?.[index]?.unitName && (
+                      <p className="text-red-500 text-[10px] mt-1 leading-tight">
+                        {errors.units?.[index]?.unitName?.message}
+                      </p>
+                    )}
+                  </div>
                 )}
               />
             </div>
@@ -99,11 +108,18 @@ export const UnitsCard = () => {
             <div className="col-span-3">
               <Input
                 type="number"
-                {...register(`units.${index}.exchangeValue`)}
+                {...register(`units.${index}.exchangeValue`, {
+                  valueAsNumber: true,
+                })}
                 className={
                   errors.units?.[index]?.exchangeValue ? "border-red-500" : ""
                 }
               />
+              {errors.units?.[index]?.exchangeValue && (
+                <p className="text-red-500 text-[10px] mt-1 leading-tight">
+                  {errors.units?.[index]?.exchangeValue?.message}
+                </p>
+              )}
             </div>
 
             <div className="col-span-3">
@@ -127,6 +143,11 @@ export const UnitsCard = () => {
                           : ""
                       }
                     />
+                    {errors.units?.[index]?.priceDefault && (
+                      <p className="text-red-500 text-[10px] mt-1 leading-tight">
+                        {errors.units?.[index]?.priceDefault?.message}
+                      </p>
+                    )}
                   </div>
                 )}
               />
