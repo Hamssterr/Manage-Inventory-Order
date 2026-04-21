@@ -132,8 +132,15 @@ export const createGuestOrder = asyncWrapper(
 export const getAllOrders = asyncWrapper(
   async (req: Request, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
-    const { status, startDate, endDate, orderCode, customerId, routeId } =
-      req.query;
+    const {
+      status,
+      startDate,
+      endDate,
+      orderCode,
+      customerId,
+      routeId,
+      search,
+    } = req.query;
 
     const query: any = {};
 
@@ -141,6 +148,14 @@ export const getAllOrders = asyncWrapper(
     if (customerId) query.customerId = customerId;
     if (routeId) query.routeId = routeId;
     if (orderCode) query.orderCode = { $regex: orderCode, $options: "i" };
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      query.$or = [
+        { customerNameSnapshot: searchRegex },
+        { customerPhoneSnapshot: searchRegex },
+      ];
+    }
 
     const dateQuery = getDateRangeQuery(startDate as string, endDate as string);
     if (Object.keys(dateQuery).length > 0) {

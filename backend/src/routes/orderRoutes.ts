@@ -24,7 +24,7 @@ router.post(
 );
 
 router.post(
-  "/",
+  "/add",
   protectAuth,
   restrictTo("admin", "owner", "salers"),
   createOrder,

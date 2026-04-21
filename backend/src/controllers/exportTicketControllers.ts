@@ -7,6 +7,10 @@ import ExportTicket from "../models/ExportTicket.js";
 import OrderService from "../services/OrderService.js";
 import { getDateRangeQuery } from "../utils/queryHelper.js";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
+import {
+  formatPaginationResponse,
+  getPaginationParams,
+} from "../utils/pagination.js";
 
 export const previewExportTicketOrder = asyncWrapper(
   async (req: Request, res: Response) => {
@@ -30,30 +34,47 @@ export const previewExportTicketOrder = asyncWrapper(
 
 export const createExportTicket = asyncWrapper(
   async (req: AuthRequest, res: Response) => {
-    const { orderIds, routeId } = req.body;
+    const { orderIds } = req.body;
     const userId = req.user?._id;
 
     if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
       throw new ErrorResponse("Please select at least 1 order", 400);
     }
-    if (!routeId) {
-      throw new ErrorResponse("Route ID is required", 400);
-    }
 
     const objectIds = orderIds.map((id) => new mongoose.Types.ObjectId(id));
 
-    const validOrdersCount = await Order.countDocuments({
+    // 1. Fetch chi tiết các đơn hàng để kiểm tra status và routeId
+    const orders = await Order.find({
       _id: { $in: objectIds },
       status: "confirmed",
       exportTicketId: { $exists: false },
     });
 
-    if (validOrdersCount !== orderIds.length) {
+    if (orders.length !== orderIds.length) {
       throw new ErrorResponse(
-        "Some orders are invalid or already have export tickets",
+        "Một số đơn hàng không hợp lệ, phải ở trạng thái confirmed và chưa có phiếu xuất",
         400,
       );
     }
+
+    // 2. Kiểm tra tính đồng nhất của tuyến đường (routeId)
+    const routeIds = [...new Set(orders.map((o) => o.routeId?.toString()))];
+
+    if (routeIds.length > 1) {
+      throw new ErrorResponse(
+        "Các đơn hàng được chọn phải cùng thuộc một tuyến đường",
+        400,
+      );
+    }
+
+    if (routeIds.length === 0 || !routeIds[0]) {
+      throw new ErrorResponse(
+        "Không tìm thấy thông tin tuyến đường trong các đơn hàng đã chọn",
+        400,
+      );
+    }
+
+    const commonRouteId = routeIds[0];
 
     const finalItems = await OrderService.getExportTicketItems(objectIds);
 
@@ -67,7 +88,7 @@ export const createExportTicket = asyncWrapper(
         [
           {
             ticketCode: ticketCode,
-            routeId: new mongoose.Types.ObjectId(routeId as string),
+            routeId: new mongoose.Types.ObjectId(commonRouteId),
             orderIds: objectIds,
             aggregatedItems: finalItems,
             status: "exported",
@@ -111,6 +132,7 @@ export const createExportTicket = asyncWrapper(
 
 export const getExportTickets = asyncWrapper(
   async (req: Request, res: Response) => {
+    const { page, limit, skip } = getPaginationParams(req);
     const { routeId, startDate, endDate, status } = req.query;
 
     const query: any = {};
@@ -128,14 +150,22 @@ export const getExportTickets = asyncWrapper(
       query.createdAt = dateQuery;
     }
 
-    const tickets = await ExportTicket.find(query)
-      .sort({ createdAt: -1 })
-      .populate("routeId", "routeName")
-      .populate("createdBy", "displayName");
+    const [tickets, totalItems] = await Promise.all([
+      ExportTicket.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("routeId", "routeName")
+        .populate("createdBy", "displayName"),
+      ExportTicket.countDocuments(query),
+    ]);
+
+    const response = formatPaginationResponse(tickets, totalItems, page, limit);
 
     res.status(200).json({
       success: true,
-      data: tickets,
+      message: "Get export tickets successfully",
+      ...response,
     });
   },
 );
