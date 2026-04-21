@@ -29,14 +29,21 @@ class OrderService {
         throw new ErrorResponse("Product not found", 404);
       }
 
+      const inputUnitName = (item as any).unitName || item.unitNameSnapshot;
+
+      if (!inputUnitName) {
+        throw new ErrorResponse("Tên đơn vị tính không được để trống", 400);
+      }
+
       const unitInfo = product.units.find(
-        (u) =>
-          u.unitName.toLocaleLowerCase() ===
-          item.unitNameSnapshot.toLocaleLowerCase(),
+        (u) => u.unitName.toLowerCase() === inputUnitName.toLowerCase(),
       );
 
       if (!unitInfo) {
-        throw new ErrorResponse("Invalid unit for product", 400);
+        throw new ErrorResponse(
+          `Đơn vị tính "${inputUnitName}" không hợp lệ cho sản phẩm ${product.name}`,
+          400,
+        );
       }
 
       const priceUnit = unitInfo.priceDefault || 0;
@@ -63,7 +70,7 @@ class OrderService {
 
   async getExportTicketItems(orderIds: mongoose.Types.ObjectId[]) {
     const aggregatedItems = await Order.aggregate([
-      { $match: { _id: { $in: orderIds }, status: "pending" } },
+      { $match: { _id: { $in: orderIds }, status: "confirmed" } },
       { $unwind: "$items" },
       {
         $lookup: {

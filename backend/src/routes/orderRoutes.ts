@@ -1,29 +1,26 @@
 import { Router } from "express";
 import express from "express";
+import { protectAuth, restrictTo } from "../middlewares/authMiddleware.js";
 import {
   createOrder,
+  createGuestOrder,
   getAllOrders,
   getDetailOrder,
   updateOrder,
   deleteOrder,
-} from "../controllers/orderControllers.js";
-import { protectAuth, restrictTo } from "../middlewares/authMiddleware.js";
-import {
-  previewExportTicketOrder,
-  createExportTicket,
-  getExportTickets,
   reconcileOrder,
   rollbackOrderToShipping,
   updateOrderStatus,
-} from "../controllers/warehouseControllers.js";
+  bulkReconcileOrders,
+} from "../controllers/orderControllers.js";
 
 const router: Router = express.Router();
 
-router.get(
-  "/export-ticket",
+router.post(
+  "/guest",
   protectAuth,
-  restrictTo("admin", "owner", "accountant"),
-  getExportTickets,
+  restrictTo("admin", "owner", "salers"),
+  createGuestOrder,
 );
 
 router.post(
@@ -32,44 +29,19 @@ router.post(
   restrictTo("admin", "owner", "salers"),
   createOrder,
 );
+
 router.get(
   "/",
   protectAuth,
   restrictTo("admin", "owner", "salers", "accountant"),
   getAllOrders,
 );
-router.get(
-  "/:orderId",
-  protectAuth,
-  restrictTo("admin", "owner", "salers", "accountant"),
-  getDetailOrder,
-);
-router.put(
-  "/:orderId",
-  protectAuth,
-  restrictTo("admin", "owner", "salers", "accountant"),
-  updateOrder,
-);
-router.delete(
-  "/:orderId",
-  protectAuth,
-  restrictTo("admin", "owner", "salers", "accountant"),
-  deleteOrder,
-);
 
-// export order
-router.post(
-  "/export-ticket",
+router.patch(
+  "/bulk-reconcile",
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
-  createExportTicket,
-);
-
-router.post(
-  "/preview-export",
-  protectAuth,
-  restrictTo("admin", "owner", "accountant"),
-  previewExportTicketOrder,
+  bulkReconcileOrders,
 );
 
 router.patch(
@@ -91,6 +63,27 @@ router.patch(
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
   updateOrderStatus,
+);
+
+router.get(
+  "/:orderId",
+  protectAuth,
+  restrictTo("admin", "owner", "salers", "accountant"),
+  getDetailOrder,
+);
+
+router.put(
+  "/:orderId",
+  protectAuth,
+  restrictTo("admin", "owner", "salers", "accountant"),
+  updateOrder,
+);
+
+router.delete(
+  "/:orderId",
+  protectAuth,
+  restrictTo("admin", "owner", "salers", "accountant"),
+  deleteOrder,
 );
 
 export default router;

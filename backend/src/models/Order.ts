@@ -30,7 +30,13 @@ export interface IOrder extends Document {
 
   items: IOrderItem[];
   totalAmount: number;
-  status: "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
+  status:
+    | "pending"
+    | "confirmed"
+    | "shipping"
+    | "delivered"
+    | "cancelled"
+    | "completed";
   note?: string;
   exportTicketId?: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -61,7 +67,6 @@ const OrderSchema = new Schema<IOrder>(
     customerId: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
-      required: true,
     },
     saleId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
@@ -75,7 +80,14 @@ const OrderSchema = new Schema<IOrder>(
     totalAmount: { type: Number, required: true, default: 0 },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "shipping", "delivered", "cancelled"],
+      enum: [
+        "pending",
+        "confirmed",
+        "shipping",
+        "delivered",
+        "cancelled",
+        "completed",
+      ],
       default: "pending",
     },
     note: { type: String },

@@ -10,6 +10,8 @@ import orderRoutes from "./routes/orderRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import routeRoutes from "./routes/routeRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import exportTicketRoutes from "./routes/exportTicketRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config();
@@ -28,6 +30,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/export-tickets", exportTicketRoutes);
+app.use("/api/reports", reportRoutes);
 app.use(errorHandler);
 
 connectDB().then(() => {
