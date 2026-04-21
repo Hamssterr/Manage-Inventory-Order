@@ -29,6 +29,16 @@ export const CreateRoute = "routes/add";
 export const UpdateRoute = "routes/";
 export const DeleteRoute = "routes/";
 
+// Order
+export const GetAllOrder = "orders/";
+export const GetDetailOrder = "orders/";
+export const CreateOrder = "orders/add";
+export const CreateGuestOrder = "orders/guest";
+
+// Export Ticket
+export const GetAllExportTicket = "export-tickets/";
+export const CreateExportTicket = "export-tickets/add";
+
 // User
 export const GetAllUsers = "users/";
 export const GetSalers = "users/salers";

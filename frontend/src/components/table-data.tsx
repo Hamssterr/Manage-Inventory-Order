@@ -44,9 +44,9 @@ export function TableData<T extends { id: string | number }>({
   actionWidth = "w-[80px]",
 }: TableDataProps<T>) {
   return (
-    <div className="rounded-md border-b overflow-hidden">
+    <div className="rounded-md border-b [&_div[data-slot=table-container]]:overflow-visible">
       <Table>
-        <TableHeader className="sticky top-0 bg-secondary/90 backdrop:-blur-sm z-10">
+        <TableHeader className="sticky top-0 bg-gray-100 backdrop-blur-sm z-10">
           <TableRow>
             <TableHead className={cn(actionWidth, "font-bold")}>
               Thao tác
@@ -54,7 +54,10 @@ export function TableData<T extends { id: string | number }>({
             {columns.map((column, index) => (
               <TableHead
                 key={index}
-                className={cn("font-bold whitespace-nowrap", column.className)}
+                className={cn(
+                  "font-bold whitespace-nowrap py-4",
+                  column.className,
+                )}
               >
                 {column.header}
               </TableHead>

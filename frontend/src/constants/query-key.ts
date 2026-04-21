@@ -6,4 +6,6 @@ export const QUERY_KEYS = {
   ROUTES: "Routes",
   USERS: "Users",
   SALERS: "Salers",
+  ORDERS: "Orders",
+  EXPORT_TICKETS: "ExportTickets",
 };

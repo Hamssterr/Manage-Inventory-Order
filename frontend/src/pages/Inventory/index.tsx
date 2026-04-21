@@ -30,7 +30,7 @@ export const InventoryPage = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const limit = 10;
+  const limit = 20;
 
   const [productToDelete, setProductToDelete] = useState<IProduct | null>(null);
 
@@ -121,7 +121,7 @@ export const InventoryPage = () => {
     {
       header: "Mã SKU",
       accessorKey: "sku",
-      className: "w-[120px] font-medium text-blue-600",
+      className: "w-[120px] font-bold",
     },
     {
       header: "Tên sản phẩm",
@@ -162,7 +162,7 @@ export const InventoryPage = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col h-full w-full flex-1 overflow-hidden bg-slate-50/30">
       <FilterBar
         onSearch={handleSearch}
         onAddNew={
@@ -170,9 +170,9 @@ export const InventoryPage = () => {
         }
         filters={filters}
       />
-      <div className="p-2 h-screen flex flex-col">
-        <div className="flex flex-1 flex-col bg-white rounded-xl border overflow-hidden">
-          <div className="flex-1 min-h-0 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex flex-col p-4 flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col bg-white rounded-xl border-slate-200 border shadow-sm overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-auto scrollbar-hide">
             {isLoading ? (
               <TableLoading />
             ) : isError ? (
@@ -199,14 +199,14 @@ export const InventoryPage = () => {
             )}
           </div>
 
-          <PageFooter>
+          <PageFooter className="bg-slate-50/50 border-t border-slate-100">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Hiển thị</span>
-              <span className="font-medium text-foreground">
+              <span className="font-bold text-foreground">
                 {startItem} - {endItem}
               </span>
               <span>trên</span>
-              <span className="font-medium text-foreground">{totalItems}</span>
+              <span className="font-bold text-foreground">{totalItems}</span>
               <span>kết quả</span>
             </div>
 

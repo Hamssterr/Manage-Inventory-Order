@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 
 export interface FilterOption {
   label: string;
@@ -31,6 +30,7 @@ interface FilterBarProps {
   onAddNew?: () => void;
   filters?: FilterDefinition[];
   defaultValue?: string;
+  children?: React.ReactNode;
 }
 
 export const FilterBar = ({
@@ -38,6 +38,7 @@ export const FilterBar = ({
   onAddNew,
   filters = [],
   defaultValue = "",
+  children,
 }: FilterBarProps) => {
   const [searchTerm, setSearchTerm] = useState(defaultValue);
   const debouncedSearchTerm = useDebounce(searchTerm, 350);
@@ -61,12 +62,8 @@ export const FilterBar = ({
       {/* flex-1 giúp khu vực này chiếm trọn không gian còn lại, đẩy nút Thêm Mới dạt sang phải */}
       <div className="flex flex-1 items-center gap-2 md:gap-3 order-1 min-w-[200px]">
         {/* Sidebar Trigger */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 border-r border-slate-200">
           <SidebarTrigger className="-ml-2 h-8 w-8 text-muted-foreground hover:text-foreground transition-colors" />
-          <Separator
-            orientation="vertical"
-            className="h-5 bg-slate-200 hidden md:block"
-          />
         </div>
 
         {/* Ô Tìm Kiếm */}
@@ -104,9 +101,8 @@ export const FilterBar = ({
       )}
 
       {/* 3. BỘ LỌC (Filters) */}
-      {/* w-full trên Mobile bắt buộc khối này rớt xuống dòng dưới. Trên Desktop nó trở lại w-auto */}
       {filters.length > 0 && (
-        <div className="order-3 md:order-2 w-full md:w-auto flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] md:border-l md:pl-3 border-slate-200">
+        <div className="order-3 md:order-2 w-full md:w-auto flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] md:pl-3 border-slate-200">
           <div className="hidden lg:flex items-center text-sm text-muted-foreground gap-1.5 mr-1 shrink-0">
             <ListFilter className="h-4 w-4" />
             <span className="font-medium">Lọc:</span>
@@ -119,7 +115,7 @@ export const FilterBar = ({
               <div key={filter.key} className="relative group/filter shrink-0">
                 <Select value={filter.value} onValueChange={filter.onChange}>
                   <SelectTrigger
-                    className={`h-9 min-w-[150px] lg:min-w-[180px] transition-all shadow-sm rounded-lg 
+                    className={`h-9 min-w-[150px] lg:min-w-[180px] transition-all rounded-lg 
     outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none
     ${isActive ? "pr-8 border-primary/40 bg-primary/5 text-primary font-medium" : "border-slate-200 bg-white text-slate-600"}`}
                   >
@@ -149,7 +145,7 @@ export const FilterBar = ({
                       e.stopPropagation();
                       filter.onChange("");
                     }}
-                    className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
                   >
                     <X className="h-2.5 w-2.5" />
                   </button>
@@ -157,6 +153,14 @@ export const FilterBar = ({
               </div>
             );
           })}
+
+          {children}
+        </div>
+      )}
+
+      {filters.length === 0 && children && (
+        <div className="order-3 md:order-2 w-full md:w-auto flex items-center gap-2 md:pl-3 border-slate-200">
+          {children}
         </div>
       )}
     </div>

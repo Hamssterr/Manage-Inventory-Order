@@ -15,6 +15,9 @@ import { CustomerPage } from "./pages/Customer";
 import { CustomerModal } from "./pages/Customer/customer-modal";
 import { RoutePage } from "./pages/Route";
 import { RouteModal } from "./pages/Route/route-modal";
+import { OrderPage } from "./pages/Order";
+import { OrderModal } from "./pages/Order/order-modal";
+import { OrderInvoiceDetails } from "./pages/Order/order-invoice-details";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -82,21 +85,12 @@ export const AppRoutes = () => {
                 { path: "routes/add", element: <RouteModal /> },
                 { path: "routes/:id", element: <RouteModal /> },
                 { path: "routes/:id/edit", element: <RouteModal /> },
-              ],
-            },
 
-            {
-              // Khu vực dành riêng cho Sales và Kế Toán (chủ/admin vẫn có thể vào nếu bạn đưa vào mảng này)
-              element: (
-                <RoleRoute
-                  allowedRoles={["salers", "accountant", "owner", "admin"]}
-                />
-              ),
-              children: [
-                {
-                  path: "orders",
-                  element: <div>Trang xem Đơn Hàng của Sales/Kế toán</div>,
-                },
+                // Orders
+                { path: "orders", element: <OrderPage /> },
+                { path: "orders/add", element: <OrderModal /> },
+                { path: "orders/:id", element: <OrderInvoiceDetails /> },
+                { path: "orders/:id/edit", element: <OrderModal /> },
               ],
             },
           ],
