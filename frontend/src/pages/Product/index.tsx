@@ -32,7 +32,7 @@ export const ProductPage = () => {
 
   const [productToDelete, setProductToDelete] = useState<IProduct | null>(null);
 
-  const { data, isLoading, isError, refetch } = useGetProduct({
+  const { data, isLoading, isError, refetch, isPending } = useGetProduct({
     limit,
     page,
     search: search !== "" ? search : undefined,
@@ -119,22 +119,18 @@ export const ProductPage = () => {
     {
       header: "Mã SKU",
       accessorKey: "sku",
-      className: "w-[100px] font-medium text-blue-600",
+      className:
+        "min-w-[100px] max-w-[110px] truncate font-medium text-blue-600",
     },
     {
       header: "Tên sản phẩm",
       accessorKey: "name",
-      className: "min-w-[200px]",
+      className: "min-w-[200px] max-w-[210px] truncate",
     },
     {
       header: "Chương trình",
       accessorKey: "category",
       className: "w-[180px]",
-    },
-    {
-      header: "Đơn vị tính",
-      accessorKey: "baseUnit",
-      className: "w-[100px] text-center",
     },
     {
       header: "Hình thức bán",
@@ -199,7 +195,12 @@ export const ProductPage = () => {
       />
 
       <div className="flex flex-col p-2 h-screen">
-        <div className="flex flex-1 flex-col bg-white rounded-xl border overflow-hidden">
+        <div className="flex flex-1 flex-col bg-white rounded-xl border overflow-hidden relative">
+          {isPending && (
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-slate-100 overflow-hidden z-50">
+              <div className="h-full bg-primary animate-[loading_1.5s_infinite_linear] w-[40%]" />
+            </div>
+          )}
           <div className="flex-1 min-h-0 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {isLoading ? (
               <TableLoading />

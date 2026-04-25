@@ -34,12 +34,13 @@ export const InventoryPage = () => {
 
   const [productToDelete, setProductToDelete] = useState<IProduct | null>(null);
 
-  const { data, isLoading, isError, refetch } = useGetInventoryProducts({
-    limit,
-    page,
-    search: search !== "" ? search : undefined,
-    category: category !== "ALL" ? category : undefined,
-  });
+  const { data, isLoading, isError, refetch, isPending } =
+    useGetInventoryProducts({
+      limit,
+      page,
+      search: search !== "" ? search : undefined,
+      category: category !== "ALL" ? category : undefined,
+    });
 
   const { mutate: deleteProduct, isPending: isDeleting } =
     useDeleteInventoryProduct();
@@ -121,7 +122,7 @@ export const InventoryPage = () => {
     {
       header: "Mã SKU",
       accessorKey: "sku",
-      className: "w-[120px] font-bold",
+      className: "w-[120px] font-medium text-blue-600",
     },
     {
       header: "Tên sản phẩm",
@@ -171,7 +172,12 @@ export const InventoryPage = () => {
         filters={filters}
       />
       <div className="flex flex-col p-4 flex-1 overflow-hidden">
-        <div className="flex flex-1 flex-col bg-white rounded-xl border-slate-200 border shadow-sm overflow-hidden">
+        <div className="flex flex-1 flex-col bg-white rounded-xl border-slate-200 border shadow-sm overflow-hidden relative">
+          {isPending && (
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-slate-100 overflow-hidden z-50">
+              <div className="h-full bg-primary animate-[loading_1.5s_infinite_linear] w-[40%]" />
+            </div>
+          )}
           <div className="flex-1 min-h-0 overflow-auto scrollbar-hide">
             {isLoading ? (
               <TableLoading />

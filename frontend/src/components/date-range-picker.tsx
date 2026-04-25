@@ -35,7 +35,7 @@ export function DatePickerWithRange({
             id="date"
             variant={"outline"}
             className={cn(
-              "h-8 min-w-[200px] md:w-[200px] justify-start text-left font-normal rounded-lg bg-white border-slate-200 transition-all shadow-sm",
+              "h-8 min-w-[150px] md:w-[200px] justify-start text-left font-normal rounded-lg bg-white border-slate-200 transition-all shadow-sm",
               !date && "text-muted-foreground",
               date?.from
                 ? "pr-8 border-primary/40 bg-primary/5 text-primary"
@@ -62,7 +62,6 @@ export function DatePickerWithRange({
           align="start"
         >
           <Calendar
-            initialFocus
             mode="range"
             defaultMonth={date?.from}
             selected={date}
@@ -77,7 +76,7 @@ export function DatePickerWithRange({
               e.stopPropagation();
               setDate(undefined);
             }}
-            className="absolute right-11 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
           >
             <X className="h-2.5 w-2.5" />
           </button>

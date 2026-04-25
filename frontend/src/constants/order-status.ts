@@ -20,13 +20,13 @@ export const ORDER_STATUS: Record<
     label: "Đã giao",
     color: "bg-green-100 text-green-700 border-green-200",
   },
-  cancelled: {
-    label: "Đã huỷ",
-    color: "bg-red-100 text-red-700 border-red-200",
-  },
   completed: {
     label: "Hoàn thành",
     color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  },
+  cancelled: {
+    label: "Đã huỷ",
+    color: "bg-red-100 text-red-700 border-red-200",
   },
 };
 

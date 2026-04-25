@@ -11,6 +11,8 @@ import {
   formatPaginationResponse,
   getPaginationParams,
 } from "../utils/pagination.js";
+import Product from "../models/Product.js";
+import { WAREHOUSE_SORT_ORDER } from "../config/warehouse.js";
 
 export const previewExportTicketOrder = asyncWrapper(
   async (req: Request, res: Response) => {
@@ -133,9 +135,13 @@ export const createExportTicket = asyncWrapper(
 export const getExportTickets = asyncWrapper(
   async (req: Request, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
-    const { routeId, startDate, endDate, status } = req.query;
+    const { routeId, startDate, endDate, status, search } = req.query;
 
     const query: any = {};
+
+    if (search) {
+      query.ticketCode = { $regex: search, $options: "i" };
+    }
 
     if (routeId) {
       query.routeId = routeId;
@@ -166,6 +172,87 @@ export const getExportTickets = asyncWrapper(
       success: true,
       message: "Get export tickets successfully",
       ...response,
+    });
+  },
+);
+
+export const getExportTicketDetail = asyncWrapper(
+  async (req: Request, res: Response) => {
+    const { ticketId } = req.params;
+
+    const ticket = await ExportTicket.findById(ticketId)
+      .populate("routeId", "routeName")
+      .populate("createdBy", "displayName")
+      .lean();
+
+    if (!ticket) {
+      throw new ErrorResponse("Không tìm thấy phiếu xuất kho", 404);
+    }
+
+    const allProducts = await Product.find({
+      isSale: true,
+      isCombo: { $ne: true },
+    })
+      .select("_id name sku category baseUnit units isCombo components")
+      .populate("components.productId", "name sku")
+      .lean();
+
+    allProducts.sort((a, b) => {
+      let indexA = WAREHOUSE_SORT_ORDER.indexOf(a.name); // Hoặc a.sku tùy bạn muốn sort theo gì
+      let indexB = WAREHOUSE_SORT_ORDER.indexOf(b.name);
+
+      if (indexA === -1) indexA = 999999;
+      if (indexB === -1) indexB = 999999;
+
+      return indexA - indexB;
+    });
+
+    // Gom dữ liệu items từ phiếu xuất để dễ tra cứu
+    const ticketItemsMap = new Map();
+    if (ticket.aggregatedItems) {
+      ticket.aggregatedItems.forEach((item: any) => {
+        ticketItemsMap.set(item.productId.toString(), item);
+      });
+    }
+
+    const loadSheetItems = allProducts.map((product) => {
+      const itemInTicket = ticketItemsMap.get(product._id.toString());
+
+      // Lấy đơn vị tính mặc định nếu không có trong phiếu
+      const defaultUnit =
+        product.units?.find((u: any) => u.isDefault)?.unitName ||
+        product.baseUnit;
+
+      return {
+        _id: product._id,
+        productId: product._id,
+        sku: product.sku,
+        productName: product.name,
+        unitName: itemInTicket ? itemInTicket.unitName : defaultUnit,
+
+        // Nếu có trong phiếu thì lấy số lượng thực tế, không có thì trả về 0
+        totalQuantity: itemInTicket ? itemInTicket.totalQuantity : 0,
+        displayQuantity: itemInTicket ? itemInTicket.displayQuantity : "0",
+
+        // Thông tin phân loại
+        isCombo: product.isCombo,
+        category: product.category,
+        isInTicket: !!itemInTicket, // Gợi ý cho FE biết sản phẩm này có thực sự nằm trong phiếu không
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Lấy chi tiết phiếu xuất thành công",
+      data: {
+        _id: ticket._id,
+        ticketCode: ticket.ticketCode,
+        routeName:
+          typeof ticket.routeId === "object"
+            ? (ticket.routeId as any).routeName
+            : "",
+        loadSheetItems: loadSheetItems,
+      },
     });
   },
 );

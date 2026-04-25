@@ -41,15 +41,14 @@ export const FilterBar = ({
   children,
 }: FilterBarProps) => {
   const [searchTerm, setSearchTerm] = useState(defaultValue);
-  const debouncedSearchTerm = useDebounce(searchTerm, 350);
-  const isFirstRender = useRef(true);
+  const debouncedSearchTerm = useDebounce(searchTerm, 400);
+  const lastSearchedTerm = useRef(defaultValue);
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    if (debouncedSearchTerm !== lastSearchedTerm.current) {
+      lastSearchedTerm.current = debouncedSearchTerm;
+      onSearch(debouncedSearchTerm);
     }
-    onSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, onSearch]);
 
   useEffect(() => {
@@ -102,7 +101,10 @@ export const FilterBar = ({
 
       {/* 3. BỘ LỌC (Filters) */}
       {filters.length > 0 && (
-        <div className="order-3 md:order-2 w-full md:w-auto flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] md:pl-3 border-slate-200">
+        <div
+          className={`order-3 md:order-2 w-full md:w-auto flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] md:pl-3 border-slate-200 
+            ${!onAddNew ? "lg:mr-3" : ""}`}
+        >
           <div className="hidden lg:flex items-center text-sm text-muted-foreground gap-1.5 mr-1 shrink-0">
             <ListFilter className="h-4 w-4" />
             <span className="font-medium">Lọc:</span>
@@ -145,7 +147,7 @@ export const FilterBar = ({
                       e.stopPropagation();
                       filter.onChange("");
                     }}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-300 hover:text-slate-700 transition-colors z-10"
                   >
                     <X className="h-2.5 w-2.5" />
                   </button>

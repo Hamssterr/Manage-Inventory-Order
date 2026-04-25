@@ -61,15 +61,24 @@ export const createCustomer = asyncWrapper(
 export const getAllCustomer = asyncWrapper(
   async (req: Request, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
+    const { search } = req.query;
+
+    const query: any = {};
+    if (search) {
+      query.$or = [
+        { name: { $regex: search as string, $options: "i" } },
+        { phoneNumber: { $regex: search as string, $options: "i" } },
+      ];
+    }
 
     const [customers, totalItems] = await Promise.all([
-      Customer.find()
+      Customer.find(query)
         .skip(skip)
         .limit(limit)
         .populate("saleReps", "displayName")
         .populate("addresses.routeId", "routeName")
         .sort({ createdAt: -1 }),
-      Customer.countDocuments(),
+      Customer.countDocuments(query),
     ]);
 
     res.status(200).json({

@@ -29,6 +29,7 @@ import {
   ShoppingCart,
   Users,
   Navigation,
+  ScrollText,
 } from "lucide-react";
 import { usePermission } from "@/hooks/usePermission";
 import { navigationConfig } from "@/constants/navigation";
@@ -39,6 +40,7 @@ const ICON_MAP: Record<string, React.ComponentType<any>> = {
   ShoppingCart,
   Users,
   Navigation,
+  ScrollText,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

@@ -101,7 +101,7 @@ export const CustomerPage = () => {
   const columns: ColumnDef<ICustomer & { id: string }>[] = [
     {
       header: "Khách hàng",
-      className: "w-[200px]",
+      className: "w-[200px] font-bold",
       cell: (row) => (
         <div className="flex items-center gap-3 py-1">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -121,7 +121,7 @@ export const CustomerPage = () => {
     {
       header: "Số điện thoại",
       accessorKey: "phoneNumber",
-      className: "w-[150px] font-medium",
+      className: "w-[150px] font-bold",
     },
 
     {
@@ -151,7 +151,8 @@ export const CustomerPage = () => {
       className: "w-[200px]",
       cell: (row) => {
         const reps = Array.isArray(row.saleReps) ? row.saleReps : [];
-        if (reps.length === 0) return <span className="text-slate-400">---</span>;
+        if (reps.length === 0)
+          return <span className="text-slate-400">---</span>;
 
         return (
           <div className="flex flex-col gap-0.5">

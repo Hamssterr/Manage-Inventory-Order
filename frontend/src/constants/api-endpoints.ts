@@ -34,9 +34,14 @@ export const GetAllOrder = "orders/";
 export const GetDetailOrder = "orders/";
 export const CreateOrder = "orders/add";
 export const CreateGuestOrder = "orders/guest";
+export const UpdateOrder = "orders/";
+export const DeleteOrder = "orders/";
+export const ConfirmedOrder = "orders/confirm";
+export const CancelOrder = "orders/cancel";
+export const BulkReconcileOrder = "orders/reconcile";
 
 // Export Ticket
-export const GetAllExportTicket = "export-tickets/";
+export const ExportTicket = "export-tickets/";
 export const CreateExportTicket = "export-tickets/add";
 
 // User

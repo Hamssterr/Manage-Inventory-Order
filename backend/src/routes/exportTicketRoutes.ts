@@ -6,6 +6,7 @@ import {
   getExportTickets,
   getExportTicketRevenue,
   deleteExportTicket,
+  getExportTicketDetail,
 } from "../controllers/exportTicketControllers.js";
 
 const router: Router = express.Router();
@@ -27,6 +28,12 @@ router.get(
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
   getExportTickets,
+);
+router.get(
+  "/:ticketId",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant"),
+  getExportTicketDetail,
 );
 router.get(
   "/:ticketId/revenue",

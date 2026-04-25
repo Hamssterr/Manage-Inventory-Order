@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { QUERY_KEYS } from "@/constants/query-key";
@@ -20,6 +25,26 @@ export const useGetAllCustomerQuery = (params: CustomerParams) => {
   return useQuery<GetAllCustomerResponse>({
     queryKey: [QUERY_KEYS.CUSTOMERS, params],
     queryFn: () => getAllCustomer(params).then((res) => res.data),
+  });
+};
+
+export const useGetInfiniteCustomerQuery = (
+  params: CustomerParams,
+  options?: any,
+) => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.CUSTOMERS, "infinite", params],
+    queryFn: ({ pageParam = 1 }) =>
+      getAllCustomer({ ...params, page: pageParam as number }).then(
+        (res) => res.data,
+      ),
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
+    staleTime: 5 * 60 * 1000, // Cache kết quả trong 5 phút
+    ...options,
   });
 };
 

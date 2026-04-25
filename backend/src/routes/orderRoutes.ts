@@ -8,10 +8,12 @@ import {
   getDetailOrder,
   updateOrder,
   deleteOrder,
-  reconcileOrder,
+  bulkReconcileOrders,
   rollbackOrderToShipping,
   updateOrderStatus,
-  bulkReconcileOrders,
+  cancelOrders,
+  cancelDeliveryOrder,
+  reconcileSingleOrder,
 } from "../controllers/orderControllers.js";
 
 const router: Router = express.Router();
@@ -37,20 +39,30 @@ router.get(
   getAllOrders,
 );
 
+// Xác nhận giao thành công hoặc thất bại
 router.patch(
-  "/bulk-reconcile",
+  "/reconcile",
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
   bulkReconcileOrders,
 );
-
+// Đối soát đơn lẻ (Thành công - hỗ trợ sửa đổi)
 router.patch(
   "/:orderId/reconcile",
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
-  reconcileOrder,
+  reconcileSingleOrder,
 );
 
+// Hủy đơn hàng duy nhất đang giao
+router.patch(
+  "/:orderId/cancel-delivery",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant"),
+  cancelDeliveryOrder,
+);
+
+// Hoàn tác đơn hàng đã giao về trạng thái đang giao hàng
 router.put(
   "/:orderId/rollback",
   protectAuth,
@@ -58,11 +70,20 @@ router.put(
   rollbackOrderToShipping,
 );
 
+// Xác nhận đơn hàng
 router.patch(
-  "/:orderId/status",
+  "/confirm",
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
   updateOrderStatus,
+);
+
+// Hủy đơn hàng
+router.patch(
+  "/cancel",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant", "salers"),
+  cancelOrders,
 );
 
 router.get(

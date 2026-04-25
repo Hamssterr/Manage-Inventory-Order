@@ -30,6 +30,13 @@ export const navigationConfig: NavigationConfig = {
       items: [{ title: "Danh sách đơn hàng", url: "/orders" }],
     },
     {
+      title: "Phiếu xuất kho",
+      url: "/export-tickets",
+      icon: "ScrollText",
+      roles: ["admin", "owner"],
+      items: [{ title: "Danh sách phiếu xuất kho", url: "/export-tickets" }],
+    },
+    {
       title: "Khách hàng",
       url: "/customers",
       icon: "Users",

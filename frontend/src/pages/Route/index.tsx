@@ -97,7 +97,7 @@ export const RoutePage = () => {
     {
       header: "Tuyến đường",
       // Tăng nhẹ chiều rộng và bỏ fixed width nếu cần để nó linh hoạt
-      className: "w-[300px] pl-4",
+      className: "w-[500px] pl-4",
       cell: (row) => (
         <div className="flex items-center gap-3 py-2">
           <div className="w-9 h-9 rounded-xl bg-orange-100/50 flex items-center justify-center shrink-0 border border-orange-200">
@@ -118,7 +118,7 @@ export const RoutePage = () => {
       header: "Mô tả",
       accessorKey: "description",
       // Chế độ xem mô tả nên để căn trái (Left) sẽ dễ đọc hơn căn giữa
-      className: "w-[400px] text-left px-4",
+      className: "w-[200px] text-left px-4",
       cell: (row) => (
         <p className="text-slate-600 line-clamp-2 text-sm leading-relaxed">
           {row.description || (

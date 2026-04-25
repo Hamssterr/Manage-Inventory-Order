@@ -18,6 +18,8 @@ import { RouteModal } from "./pages/Route/route-modal";
 import { OrderPage } from "./pages/Order";
 import { OrderModal } from "./pages/Order/order-modal";
 import { OrderInvoiceDetails } from "./pages/Order/order-invoice-details";
+import { ExportTicketPage } from "./pages/Export-Ticket";
+import { ExportTicketDetail } from "./pages/Export-Ticket/export-ticket-details";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -91,6 +93,10 @@ export const AppRoutes = () => {
                 { path: "orders/add", element: <OrderModal /> },
                 { path: "orders/:id", element: <OrderInvoiceDetails /> },
                 { path: "orders/:id/edit", element: <OrderModal /> },
+
+                // Export-Tickets
+                { path: "export-tickets", element: <ExportTicketPage /> },
+                { path: "export-tickets/:id", element: <ExportTicketDetail /> },
               ],
             },
           ],
