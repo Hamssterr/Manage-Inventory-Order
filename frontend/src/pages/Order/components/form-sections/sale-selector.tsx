@@ -32,6 +32,7 @@ export const SaleSelector = () => {
   } = useFormContext<CreateOrderFormValues>();
 
   const selectedSale = useWatch({ control, name: "saleId" });
+  const isGuest = useWatch({ control, name: "isGuest" });
   const fallbackSaleName = useWatch({ control, name: "saleNameSnapshot" });
 
   const displayNameLabel = useMemo(() => {
@@ -87,7 +88,8 @@ export const SaleSelector = () => {
       <div className="flex items-center gap-2 mb-3">
         <UserCircle className="w-4 h-4 text-slate-500" />
         <label className="text-sm font-semibold text-slate-700">
-          Nhân viên phụ trách <span className="text-red-500">*</span>
+          Nhân viên phụ trách{" "}
+          {!isGuest && <span className="text-red-500">*</span>}
         </label>
       </div>
 

@@ -4,6 +4,7 @@ export interface IProductUnit {
   unitName: string;
   exchangeValue: number;
   priceDefault?: number;
+  tax?: number;
   isDefault: boolean;
 }
 
@@ -41,6 +42,10 @@ const ProductUnitSchema = new Schema<IProductUnit>(
       min: 1,
     },
     priceDefault: {
+      type: Number,
+      default: 0,
+    },
+    tax: {
       type: Number,
       default: 0,
     },

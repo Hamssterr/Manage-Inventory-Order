@@ -10,14 +10,39 @@ export const orderItemSchema = z.object({
   note: z.string().optional(),
 });
 
-export const createOrderSchema = z.object({
-  customerId: z.string().min(1, "Vui lòng chọn khách hàng"),
-  customerNameSnapshot: z.string().optional(),
-  saleId: z.string().min(1, "Vui lòng chọn nhân viên bán hàng"),
-  saleNameSnapshot: z.string().optional(),
-  note: z.string().optional(),
-  items: z.array(orderItemSchema).min(1, "Đơn hàng phải có ít nhất 1 sản phẩm"),
-});
+export const createOrderSchema = z
+  .object({
+    isGuest: z.boolean(),
+    // Fields for normal order
+    customerId: z.string().optional(),
+    customerNameSnapshot: z.string().optional(),
+
+    // Fields for guest order
+    guestName: z.string().optional(),
+    guestPhone: z.string().optional(),
+    guestAddress: z.string().optional(),
+    guestTaxCode: z.string().optional(),
+
+    saleId: z.string().optional(),
+    saleNameSnapshot: z.string().optional(),
+    note: z.string().optional(),
+    items: z
+      .array(orderItemSchema)
+      .min(1, "Đơn hàng phải có ít nhất 1 sản phẩm"),
+  })
+  .refine(
+    (data) => {
+      if (data.isGuest) {
+        return !!data.guestName && !!data.guestPhone && !!data.guestAddress;
+      }
+      return !!data.customerId && !!data.saleId;
+    },
+    {
+      message:
+        "Vui lòng nhập đầy đủ thông tin khách hàng và nhân viên phụ trách",
+      path: ["customerId"],
+    },
+  );
 
 // Schema cho tạo đơn hàng khách vãng lai (Guest)
 export const createGuestOrderSchema = z.object({

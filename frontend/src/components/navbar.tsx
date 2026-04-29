@@ -1,13 +1,4 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   DropdownMenu,
@@ -18,39 +9,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Bell } from "lucide-react";
 
 export const Navbar = () => {
   const { user } = useAuthStore();
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 sticky top-0 bg-background">
+    <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-y-3 gap-x-3 p-4 bg-white border-b sticky top-0 z-10 w-full shadow-sm">
       {/* Bên trái: Sidebar + Breadcrumb */}
       <div className="flex items-center gap-2">
-        <SidebarTrigger size="sm" className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-10" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">Hệ thống quản lý</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Trang chủ</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
-      {/* Ở giữa: Thanh Search (Tùy chọn) */}
-      <div className="hidden md:flex relative max-w-sm w-full items-center">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Tìm kiếm nhanh..."
-          className="pl-8 bg-muted/50"
-        />
+        <div className="flex items-center gap-2 shrink-0 border-r border-slate-200">
+          <SidebarTrigger className="-ml-2 h-8 w-8 text-muted-foreground hover:text-foreground transition-colors" />
+        </div>
+        <a
+          href="/"
+          className=" text-md text-muted-foreground hover:text-muted-foreground/80"
+        >
+          Trang chủ
+        </a>
       </div>
 
       {/* Bên phải: Thông báo & User Profile */}
@@ -90,6 +66,6 @@ export const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
+    </div>
   );
 };

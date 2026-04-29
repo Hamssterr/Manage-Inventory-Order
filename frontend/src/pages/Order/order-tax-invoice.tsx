@@ -1,26 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import {
-  Printer,
-  Download,
-  Loader2,
-  AlertCircle,
-  FileText,
-} from "lucide-react";
+import { Printer, Download, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { useGetOrderDetailQuery } from "@/hooks/useOrder";
-import { InvoiceForm } from "./components/invoice/invoice-form";
-import { OrderPdf } from "./components/invoice/order-pdf";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import type { IOrder } from "@/types/order";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { InvoiceTaxForm } from "./components/invoice/invoice-tax-form";
+import { OrderTaxPdf } from "./components/invoice/order-tax-pdf";
 
-export const OrderInvoiceDetails = () => {
+export const OrderTaxInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -113,22 +107,10 @@ export const OrderInvoiceDetails = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 lg:px-6 gap-2 rounded-lg border-blue-200 bg-white hover:bg-slate-50 shadow-sm hidden md:flex text-blue-600"
-            onClick={() =>
-              navigate(`/orders/${id}/tax-invoice`, { state: { order } })
-            }
-          >
-            <FileText className="h-4 w-4" />
-            <span>Hóa đơn thuế</span>
-          </Button>
-
           {order && (
             <PDFDownloadLink
-              document={<OrderPdf order={order} />}
-              fileName={`HoaDon_${order.orderCode}.pdf`}
+              document={<OrderTaxPdf order={order} />}
+              fileName={`HoaDonThue_${order.orderCode}.pdf`}
             >
               {({ loading }) => (
                 <Button
@@ -165,7 +147,7 @@ export const OrderInvoiceDetails = () => {
         <div className="max-w-5xl mx-auto">
           {order && (
             <div ref={printRef} className="w-full">
-              <InvoiceForm order={order} />
+              <InvoiceTaxForm order={order} />
             </div>
           )}
         </div>

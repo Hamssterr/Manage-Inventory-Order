@@ -49,6 +49,7 @@ export const UnitsCard = () => {
               unitName: "",
               exchangeValue: 1,
               priceDefault: 0,
+              tax: 0,
               isDefault: false,
             })
           }
@@ -64,14 +65,15 @@ export const UnitsCard = () => {
 
       <div className="p-4 space-y-4">
         <div className="grid grid-cols-12 text-xs font-semibold text-muted-foreground px-1 uppercase">
-          <div className="col-span-3">Tên đơn vị</div>
-          <div className="col-span-3">Giá trị quy đổi</div>
-          <div className="col-span-3">Giá mặc định</div>
-          <div className="col-span-2 text-center">Mặc định</div>
+          <div className="col-span-2">Tên đơn vị</div>
+          <div className="col-span-2">Giá trị quy đổi</div>
+          <div className="col-span-3 ml-1">Giá sản phẩm</div>
+          <div className="col-span-3 ml-1">Thuế sản phẩm</div>
+          <div className="col-span-1 text-center">Mặc định</div>
         </div>
         {fields.map((field, index) => (
           <div key={field.id} className="grid grid-cols-12 items-start gap-2">
-            <div className="col-span-3">
+            <div className="col-span-2">
               <Controller
                 control={control}
                 name={`units.${index}.unitName`}
@@ -105,7 +107,7 @@ export const UnitsCard = () => {
               />
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-2">
               <Input
                 type="number"
                 {...register(`units.${index}.exchangeValue`, {
@@ -153,7 +155,36 @@ export const UnitsCard = () => {
               />
             </div>
 
-            <div className="col-span-2 flex justify-center mt-2">
+            <div className="col-span-3">
+              <Controller
+                control={control}
+                name={`units.${index}.tax`}
+                render={({ field: { onChange, value, ref } }) => (
+                  <div className="relative">
+                    <Input
+                      ref={ref}
+                      onChange={(e) => {
+                        const rawValue = e.target.value.replace(/[^0-9]/g, "");
+                        onChange(rawValue === "" ? "" : Number(rawValue));
+                      }}
+                      value={formatCurrency(value)}
+                      type="text"
+                      inputMode="numeric"
+                      className={
+                        errors.units?.[index]?.tax ? "border-red-500" : ""
+                      }
+                    />
+                    {errors.units?.[index]?.tax && (
+                      <p className="text-red-500 text-[10px] mt-1 leading-tight">
+                        {errors.units?.[index]?.tax?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              />
+            </div>
+
+            <div className="col-span-1 flex justify-center mt-2">
               <Controller
                 control={control}
                 name={`units.${index}.isDefault`}

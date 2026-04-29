@@ -18,6 +18,7 @@ import { RouteModal } from "./pages/Route/route-modal";
 import { OrderPage } from "./pages/Order";
 import { OrderModal } from "./pages/Order/order-modal";
 import { OrderInvoiceDetails } from "./pages/Order/order-invoice-details";
+import { OrderTaxInvoice } from "./pages/Order/order-tax-invoice";
 import { ExportTicketPage } from "./pages/Export-Ticket";
 import { ExportTicketDetail } from "./pages/Export-Ticket/export-ticket-details";
 
@@ -92,6 +93,7 @@ export const AppRoutes = () => {
                 { path: "orders", element: <OrderPage /> },
                 { path: "orders/add", element: <OrderModal /> },
                 { path: "orders/:id", element: <OrderInvoiceDetails /> },
+                { path: "orders/:id/tax-invoice", element: <OrderTaxInvoice /> },
                 { path: "orders/:id/edit", element: <OrderModal /> },
 
                 // Export-Tickets

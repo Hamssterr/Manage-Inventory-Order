@@ -47,3 +47,7 @@ export const CreateExportTicket = "export-tickets/add";
 // User
 export const GetAllUsers = "users/";
 export const GetSalers = "users/salers";
+
+// Report
+export const GetDashboardStats = "reports/dashboard-stats";
+export const GetBarChartData = "reports/chart";

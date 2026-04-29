@@ -21,6 +21,7 @@ class OrderService {
 
   async processOrderItems(items: IOrderItem[]) {
     let totalAmount = 0;
+    let totalTaxAmount = 0;
     const processedItems = [];
 
     for (const item of items) {
@@ -49,12 +50,17 @@ class OrderService {
       const priceUnit = unitInfo.priceDefault || 0;
       const subTotal = item.quantity * priceUnit;
 
+      // Tính thuế: Chỉ tính nếu sản phẩm là sản phẩm bán
+      const taxAmountSnapshot = product.isSale ? (unitInfo.tax || 0) : 0;
+      const itemTotalTax = taxAmountSnapshot * item.quantity;
+
       processedItems.push({
         productId: item.productId,
         skuSnapshot: product.sku,
         productNameSnapshot: product.name,
         unitNameSnapshot: unitInfo.unitName,
         exchangeValueSnapshot: unitInfo.exchangeValue,
+        taxAmountSnapshot: taxAmountSnapshot,
         quantity: item.quantity,
         priceUnit,
         subTotal,
@@ -63,9 +69,10 @@ class OrderService {
       });
 
       totalAmount += subTotal;
+      totalTaxAmount += itemTotalTax;
     }
 
-    return { processedItems, totalAmount };
+    return { processedItems, totalAmount, totalTaxAmount };
   }
 
   async getExportTicketItems(orderIds: mongoose.Types.ObjectId[]) {

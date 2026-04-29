@@ -12,6 +12,7 @@ export interface IProductUnit {
   unitName: string;
   exchangeValue: number;
   priceDefault: number;
+  tax?: number;
   isDefault: boolean;
 }
 

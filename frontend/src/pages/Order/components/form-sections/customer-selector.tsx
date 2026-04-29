@@ -89,6 +89,62 @@ export const CustomerSelector = () => {
     setIsOpen(false);
   };
 
+  const isGuest = useWatch({ control, name: "isGuest" });
+
+  if (isGuest) {
+    return (
+      <div className="p-4 bg-blue-50/30 border border-blue-100 rounded-xl space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <UserCircle className="w-4 h-4 text-blue-600" />
+          <label className="text-sm font-semibold text-slate-700">
+            Thông tin khách vãng lai <span className="text-red-500">*</span>
+          </label>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <Input
+              {...control.register("guestName")}
+              placeholder="Tên khách hàng"
+              className={cn(
+                "bg-white h-10 text-sm",
+                errors.guestName ? "border-red-500" : "border-slate-200",
+              )}
+            />
+          </div>
+
+          <div>
+            <Input
+              {...control.register("guestPhone")}
+              placeholder="Số điện thoại"
+              className={cn(
+                "bg-white h-10 text-sm",
+                errors.guestPhone ? "border-red-500" : "border-slate-200",
+              )}
+            />
+          </div>
+
+          <div>
+            <Input
+              {...control.register("guestAddress")}
+              placeholder="Địa chỉ giao hàng"
+              className={cn(
+                "bg-white h-10 text-sm",
+                errors.guestAddress ? "border-red-500" : "border-slate-200",
+              )}
+            />
+          </div>
+        </div>
+
+        {(errors.guestName || errors.guestPhone || errors.guestAddress) && (
+          <p className="text-red-500 text-[12px] font-medium">
+            Vui lòng nhập đầy đủ thông tin bắt buộc
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       className="p-4 bg-slate-50 border border-slate-100 rounded-xl relative"
@@ -143,7 +199,7 @@ export const CustomerSelector = () => {
         <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] z-50 max-h-[320px] overflow-y-auto overflow-x-hidden animate-in fade-in slide-in-from-top-2 duration-200 [scrollbar-width:auto] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
           <div className="p-2">
             {debouncedSearch.length > 0 && debouncedSearch.length < 3 ? (
-              <div className="lg:hidden! p-4 text-sm text-slate-500 text-center flex items-center justify-center gap-2 bg-slate-50 rounded-lg">
+              <div className="p-4 text-sm text-slate-500 text-center flex items-center justify-center gap-2 bg-slate-50 rounded-lg">
                 <Search className="w-4 h-4 " />
                 Nhập thêm {3 - debouncedSearch.length} ký tự để tìm kiếm...
               </div>

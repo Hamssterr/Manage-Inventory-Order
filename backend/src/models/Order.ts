@@ -8,6 +8,7 @@ export interface IOrderItem {
   productNameSnapshot: string;
   unitNameSnapshot: string;
   exchangeValueSnapshot: number;
+  taxAmountSnapshot: number;
   quantity: number;
   deliveredQuantity?: number;
   priceUnit: number;
@@ -30,6 +31,7 @@ export interface IOrder extends Document {
 
   items: IOrderItem[];
   totalAmount: number;
+  totalTaxAmount: number;
   status:
     | "pending"
     | "confirmed"
@@ -49,6 +51,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
   productNameSnapshot: { type: String, required: true },
   unitNameSnapshot: { type: String, required: true },
   exchangeValueSnapshot: { type: Number, required: true },
+  taxAmountSnapshot: { type: Number, required: true, default: 0 },
   quantity: { type: Number, required: true, min: 1 },
   deliveredQuantity: { type: Number, min: 0 },
   priceUnit: { type: Number, required: true, min: 0 },
@@ -78,6 +81,7 @@ const OrderSchema = new Schema<IOrder>(
 
     items: [OrderItemSchema],
     totalAmount: { type: Number, required: true, default: 0 },
+    totalTaxAmount: { type: Number, required: true, default: 0 },
     status: {
       type: String,
       enum: [

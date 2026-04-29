@@ -42,6 +42,7 @@ export const createInventoryProduct = asyncWrapper(
         unitName: u.unitName.trim().toLowerCase(),
         exchangeValue: Number(u.exchangeValue),
         priceDefault: Number(u.priceDefault || 0),
+        tax: Number(u.tax || 0),
         isDefault: Boolean(u.isDefault),
       }));
 

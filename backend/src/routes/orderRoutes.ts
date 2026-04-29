@@ -14,6 +14,7 @@ import {
   cancelOrders,
   cancelDeliveryOrder,
   reconcileSingleOrder,
+  getTaxInvoice,
 } from "../controllers/orderControllers.js";
 
 const router: Router = express.Router();
@@ -105,6 +106,14 @@ router.delete(
   protectAuth,
   restrictTo("admin", "owner", "salers", "accountant"),
   deleteOrder,
+);
+
+// Hóa đơn thuế
+router.get(
+  "/:orderId/tax-invoice",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant"),
+  getTaxInvoice,
 );
 
 export default router;

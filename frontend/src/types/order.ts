@@ -41,6 +41,7 @@ export interface IOrderItem {
   exchangeValueSnapshot: number;
   quantity: number;
   priceUnit: number;
+  taxAmountSnapshot?: number;
   subTotal: number;
   isGift: boolean;
   deliveredQuantity?: number;
@@ -62,6 +63,7 @@ export interface IOrder {
 
   items: IOrderItem[];
   totalAmount: number;
+  totalTaxAmount?: number;
   status: OrderStatus;
 
   note?: string;

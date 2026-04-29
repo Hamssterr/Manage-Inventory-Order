@@ -36,6 +36,7 @@ export const ProductModal = () => {
             unitName: u.unitName,
             priceDefault: u.priceDefault,
             isDefault: u.isDefault,
+            tax: u.tax || 0,
             exchangeValue: u.exchangeValue,
           }))
         : [
@@ -43,6 +44,7 @@ export const ProductModal = () => {
               unitName: "",
               exchangeValue: 1,
               priceDefault: 0,
+              tax: 0,
               isDefault: true,
             },
           ],

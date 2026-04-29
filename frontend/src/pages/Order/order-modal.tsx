@@ -17,7 +17,7 @@ export const OrderModal = () => {
   const { id } = useParams();
 
   const isEditMode = location.pathname.includes("edit") && !!id;
-  const { onOrderSubmit, isPending } = useOrderActions(id);
+  const { onOrderSubmit, onGuestOrderSubmit, isPending } = useOrderActions(id);
 
   // Dữ liệu truyền từ trang danh sách (nếu có)
   const stateOrder = location.state?.order as IOrder;
@@ -29,7 +29,12 @@ export const OrderModal = () => {
   const methods = useForm<CreateOrderFormValues>({
     resolver: zodResolver(createOrderSchema),
     defaultValues: {
+      isGuest: false,
       customerId: "",
+      guestName: "",
+      guestPhone: "",
+      guestAddress: "",
+      guestTaxCode: "",
       saleId: "",
       items: [],
       note: "",
@@ -71,20 +76,35 @@ export const OrderModal = () => {
   };
 
   const onSubmit = (data: CreateOrderFormValues) => {
-    // Mapping format for API
-    const submitData = {
-      customerId: data.customerId,
-      saleId: data.saleId,
-      note: data.note,
-      items: data.items.map((item) => ({
-        productId: item.productId,
-        unitName: item.unitName,
-        quantity: item.quantity,
-        note: item.note,
-      })),
-    };
-
-    onOrderSubmit(submitData, isEditMode);
+    if (data.isGuest) {
+      const guestData = {
+        guestName: data.guestName!,
+        guestPhone: data.guestPhone!,
+        guestAddress: data.guestAddress!,
+        guestTaxCode: data.guestTaxCode,
+        note: data.note,
+        items: data.items.map((item) => ({
+          productId: item.productId,
+          unitName: item.unitName,
+          quantity: item.quantity,
+          note: item.note,
+        })),
+      };
+      onGuestOrderSubmit(guestData);
+    } else {
+      const submitData = {
+        customerId: data.customerId!,
+        saleId: data.saleId!,
+        note: data.note,
+        items: data.items.map((item) => ({
+          productId: item.productId,
+          unitName: item.unitName,
+          quantity: item.quantity,
+          note: item.note,
+        })),
+      };
+      onOrderSubmit(submitData, isEditMode);
+    }
   };
 
   const onError = (errors: any) => {

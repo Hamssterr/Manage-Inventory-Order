@@ -10,9 +10,8 @@ import {
   formatPaginationResponse,
   getPaginationParams,
 } from "../utils/pagination.js";
-import { getDateRangeQuery } from "../utils/queryHelper.js";
+import { getDateRangeQuery } from "../utils/dateHelper.js";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
-import { IProduct } from "../models/Product.js";
 
 export const createOrder = asyncWrapper(async (req: Request, res: Response) => {
   const { customerId, items, note, saleId } = req.body;
@@ -27,7 +26,7 @@ export const createOrder = asyncWrapper(async (req: Request, res: Response) => {
   const fullAddress = `${customer?.addresses?.addressDetail}, ${customer?.addresses?.ward}, ${customer?.addresses?.district}, ${customer?.addresses?.province}`;
   const routeId = customer?.addresses?.routeId;
 
-  const { processedItems, totalAmount } =
+  const { processedItems, totalAmount, totalTaxAmount } =
     await OrderService.processOrderItems(items);
 
   const newOrder = await Order.create({
@@ -41,6 +40,7 @@ export const createOrder = asyncWrapper(async (req: Request, res: Response) => {
     customerTaxCodeSnapshot: customer.taxCode,
     items: processedItems,
     totalAmount,
+    totalTaxAmount,
     note,
     status: "pending",
   });
@@ -70,7 +70,7 @@ export const createGuestOrder = asyncWrapper(
 
     try {
       const orderCode = OrderService.generateOrderCode();
-      const { processedItems, totalAmount } =
+      const { processedItems, totalAmount, totalTaxAmount } =
         await OrderService.processOrderItems(items);
 
       const stockUpdates: { productId: any; quantity: number }[] = [];
@@ -104,6 +104,7 @@ export const createGuestOrder = asyncWrapper(
             customerTaxCodeSnapshot: guestTaxCode,
             items: processedItems,
             totalAmount,
+            totalTaxAmount,
             note,
             status: "completed",
           },
@@ -187,10 +188,9 @@ export const getDetailOrder = asyncWrapper(
   async (req: Request, res: Response) => {
     const { orderId } = req.params;
 
-    const order = await Order.findById(orderId).populate(
-      "saleId",
-      "displayName",
-    ).populate("routeId", "routeName");
+    const order = await Order.findById(orderId)
+      .populate("saleId", "displayName")
+      .populate("routeId", "routeName");
 
     if (!order) {
       throw new ErrorResponse("Order not found", 404);
@@ -249,10 +249,11 @@ export const updateOrder = asyncWrapper(
 
     // 3. Cập nhật Sản phẩm & Tính toán lại tiền
     if (items && items.length > 0) {
-      const { processedItems, totalAmount } =
+      const { processedItems, totalAmount, totalTaxAmount } =
         await OrderService.processOrderItems(items);
       updateData.items = processedItems;
       updateData.totalAmount = totalAmount;
+      updateData.totalTaxAmount = totalTaxAmount;
     }
 
     const updatedOrder = await Order.findByIdAndUpdate(
@@ -583,12 +584,14 @@ export const reconcileSingleOrder = asyncWrapper(
       // 1. Process new items if provided
       let finalItems = order.items;
       let finalTotalAmount = order.totalAmount;
+      let finalTotalTaxAmount = order.totalTaxAmount;
 
       if (items && items.length > 0) {
-        const { processedItems, totalAmount } =
+        const { processedItems, totalAmount, totalTaxAmount } =
           await OrderService.processOrderItems(items);
         finalItems = processedItems as any;
         finalTotalAmount = totalAmount;
+        finalTotalTaxAmount = totalTaxAmount;
       }
 
       // 2. Prepare stock updates
@@ -610,6 +613,7 @@ export const reconcileSingleOrder = asyncWrapper(
       // 3. Update order fields
       order.items = finalItems;
       order.totalAmount = finalTotalAmount;
+      order.totalTaxAmount = finalTotalTaxAmount;
       order.status = "delivered";
       if (note) {
         order.note = order.note ? `${order.note}\n${note}` : note;
@@ -641,5 +645,39 @@ export const reconcileSingleOrder = asyncWrapper(
       session.endSession();
       throw new ErrorResponse(err.message || "Lỗi giao hàng", 500);
     }
+  },
+);
+
+export const getTaxInvoice = asyncWrapper(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      throw new ErrorResponse("Order not found", 404);
+    }
+
+    const taxInvoiceData = {
+      orderCode: order.orderCode,
+      customerName: order.customerNameSnapshot,
+      customerTaxCode: order.customerTaxCodeSnapshot,
+      customerAddress: order.deliveryAddressSnapshot,
+      items: order.items.map((item) => ({
+        productName: item.productNameSnapshot,
+        unit: item.unitNameSnapshot,
+        quantity: item.quantity,
+        priceUnit: item.priceUnit,
+        taxUnit: item.taxAmountSnapshot,
+      })),
+      totalOrderAmount: order.totalAmount,
+      totalTaxAmount: order.totalTaxAmount,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Lấy dữ liệu hóa đơn thuế thành công",
+      data: taxInvoiceData,
+    });
   },
 );
