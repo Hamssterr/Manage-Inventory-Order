@@ -311,7 +311,13 @@ export const OrderPage = () => {
                 onUpdate={(row) =>
                   navigate(`/orders/${row.id}/edit`, { state: { order: row } })
                 }
-                onDelete={(row) => setOrderIdToDelete(row.id)}
+                onDelete={(row) => {
+                  if (hasRole(["admin", "owner"])) {
+                    setOrderIdToDelete(row.id);
+                  } else {
+                    toast.error("Bạn không có quyền thực hiện hành động này");
+                  }
+                }}
                 enableSelection
                 selectedIds={selectedOrders}
                 onSelectionChange={setSelectedOrders}

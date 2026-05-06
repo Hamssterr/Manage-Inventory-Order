@@ -7,6 +7,7 @@ import {
   getPaginationParams,
 } from "../utils/pagination.js";
 import Customer from "../models/Customer.js";
+import { AuthRequest } from "../middlewares/authMiddleware.js";
 
 export const createRoute = asyncWrapper(async (req: Request, res: Response) => {
   const { routeName, description, responsibleSale } = req.body;
@@ -38,19 +39,26 @@ export const createRoute = asyncWrapper(async (req: Request, res: Response) => {
 });
 
 export const getRouteList = asyncWrapper(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
     const { search, saleId } = req.query;
+    const user = req.user;
 
     const query: any = {};
+
+    const isRestricted = !["admin", "owner", "accountant"].includes(
+      user?.role || "",
+    );
+
+    if (isRestricted) {
+      query.responsibleSale = user?._id;
+    } else if (saleId) {
+      query.responsibleSale = saleId;
+    }
 
     if (search) {
       const searchRegex = new RegExp(search as string, "i");
       query.$or = [{ routeName: searchRegex }, { description: searchRegex }];
-    }
-
-    if (saleId) {
-      query.responsibleSale = saleId;
     }
 
     const [routes, totalItems] = await Promise.all([

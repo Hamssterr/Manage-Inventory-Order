@@ -8,11 +8,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bell } from "lucide-react";
+import { useLogoutMutation } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const { user } = useAuthStore();
+  const { mutate: logout } = useLogoutMutation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-y-3 gap-x-3 p-4 bg-white border-b sticky top-0 z-10 w-full shadow-sm">
@@ -40,6 +48,12 @@ export const Navbar = () => {
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 outline-none">
               <Avatar className="h-8 w-8 border">
+                <AvatarImage
+                  src={user?.avatarUrl}
+                  alt={user?.displayName || "User"}
+                  className="object-cover"
+                />
+                {/* Tự động ẩn nếu có avatar rồi */}
                 <AvatarFallback className="bg-primary/10 text-primary">
                   {user?.displayName?.charAt(0) || "U"}
                 </AvatarFallback>
@@ -57,10 +71,14 @@ export const Navbar = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Hồ sơ cá nhân</DropdownMenuItem>
-            <DropdownMenuItem>Cài đặt hệ thống</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/profile")}>
+              Hồ sơ cá nhân
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive"
+            >
               Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>

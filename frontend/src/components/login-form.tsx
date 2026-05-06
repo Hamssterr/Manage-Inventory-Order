@@ -82,12 +82,12 @@ export function LoginForm({
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
+            {/* <a
               href="#"
               className="ml-auto text-sm underline-offset-4 hover:underline"
             >
               Forgot your password?
-            </a>
+            </a> */}
           </div>
           <Input
             id="password"
@@ -111,7 +111,7 @@ export function LoginForm({
             {isPending ? "Logiging in..." : "Login"}
           </Button>
         </Field>
-        <FieldSeparator>Or continue with</FieldSeparator>
+        {/* <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
           <Button variant="outline" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export function LoginForm({
               Sign up
             </a>
           </FieldDescription>
-        </Field>
+        </Field> */}
       </FieldGroup>
     </form>
   );

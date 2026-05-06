@@ -21,6 +21,7 @@ import { OrderInvoiceDetails } from "./pages/Order/order-invoice-details";
 import { OrderTaxInvoice } from "./pages/Order/order-tax-invoice";
 import { ExportTicketPage } from "./pages/Export-Ticket";
 import { ExportTicketDetail } from "./pages/Export-Ticket/export-ticket-details";
+import { ProfilePage } from "./pages/Profile";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -41,6 +42,7 @@ export const AppRoutes = () => {
           element: <ProtectedRoute />, // 1. Lớp cửa số 1: Bắt buộc đã Đăng Nhập
           children: [
             { index: true, element: <HomePage /> },
+            { path: "profile", element: <ProfilePage /> },
 
             // 2. Lớp cửa số 2: Phân quyền theo Nhóm Role
             {

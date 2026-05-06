@@ -11,8 +11,12 @@ import { HeaderActions } from "./components/header-actions";
 import { InfoCard } from "./components/info-card";
 import { AddressCard } from "./components/address-card";
 import { SalesRepCard } from "./components/sales-rep-card";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { usePermission } from "@/hooks/usePermission";
 
 export const CustomerModal = () => {
+  const { user } = useAuthStore();
+  const { hasRole } = usePermission();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +37,7 @@ export const CustomerModal = () => {
       name: "",
       phoneNumber: "",
       taxCode: "",
-      saleReps: [],
+      saleReps: user?.role === "salers" ? [user._id] : [],
       addresses: {
         addressDetail: "",
         ward: "",
@@ -117,7 +121,7 @@ export const CustomerModal = () => {
             {/* ── Main Information (Left Column) ── */}
             <fieldset
               disabled={isPending || isViewMode}
-              className="flex flex-col col-span-1 lg:col-span-8 space-y-4 lg:space-y-6 disabled:opacity-90"
+              className={`flex flex-col col-span-1 space-y-4 lg:space-y-6 disabled:opacity-90 ${hasRole(["salers"]) ? "lg:col-span-12" : "lg:col-span-8"}`}
             >
               <InfoCard />
               <AddressCard
@@ -127,14 +131,16 @@ export const CustomerModal = () => {
             </fieldset>
 
             {/* ── Metadata & Assignment (Right Column) ── */}
-            <div className="col-span-1 lg:col-span-4">
-              <fieldset
-                disabled={isPending || isViewMode}
-                className="disabled:opacity-90 h-full"
-              >
-                <SalesRepCard disabled={isPending || isViewMode} />
-              </fieldset>
-            </div>
+            {hasRole(["salers"]) ? null : (
+              <div className="col-span-1 lg:col-span-4">
+                <fieldset
+                  disabled={isPending || isViewMode}
+                  className="disabled:opacity-90 h-full"
+                >
+                  <SalesRepCard disabled={isPending || isViewMode} />
+                </fieldset>
+              </div>
+            )}
           </div>
         </div>
       </form>

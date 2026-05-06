@@ -148,9 +148,17 @@ export interface CancelOrderResponse extends BaseResponse {
 }
 
 // Confirm đơn hàng ở trạng thái shipping thành delivered
+export interface IReconcileItem {
+  orderItemId?: string;
+  productId: string;
+  unitName: string;
+  quantity: number;
+  deliveredQuantity?: number;
+  note?: string;
+}
 
 export interface IReconcileSingleOrderRequest {
-  items?: ICreateOrderItemRequest[];
+  items: IReconcileItem[];
   note?: string;
 }
 

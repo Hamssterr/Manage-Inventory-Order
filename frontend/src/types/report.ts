@@ -32,3 +32,22 @@ export interface BarChartData {
 export type ChartFilter = "Tuần" | "Tháng" | "Năm";
 
 export type BarChartDataResponse = BaseDetailResponse<BarChartData>;
+
+// Saler Revenue
+export interface SalerRevenueData {
+  chartData: IChartData[];
+  topProducts: ITopProduct[];
+}
+
+export type SalerRevenueDataResponse = BaseDetailResponse<SalerRevenueData>;
+
+export interface ISellingProduct {
+  _id: string;
+  productName: string;
+  sku: string;
+  totalQuantity: number;
+  totalRevenue: number;
+  orderCount: number;
+}
+
+export type SellingProductsResponse = BaseDetailResponse<ISellingProduct[]>;

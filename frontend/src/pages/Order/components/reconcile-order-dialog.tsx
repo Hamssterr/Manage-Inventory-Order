@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useGetOrderDetailQuery, useOrderActions } from "@/hooks/useOrder";
 import { FormProvider, useForm } from "react-hook-form";
@@ -33,6 +34,7 @@ export const ReconcileOrderDialog = ({
     defaultValues: {
       customerId: "temp",
       saleId: "temp",
+      isGuest: false,
       items: [],
       note: "",
     },
@@ -42,21 +44,36 @@ export const ReconcileOrderDialog = ({
 
   useEffect(() => {
     if (orderInfo) {
+      const saleIdRaw = orderInfo.saleId;
+      const saleId =
+        typeof saleIdRaw === "object" && saleIdRaw !== null
+          ? (saleIdRaw as any)._id
+          : (saleIdRaw as string);
+
+      const customerIdRaw = orderInfo.customerId;
+      const customerId =
+        typeof customerIdRaw === "object" && customerIdRaw !== null
+          ? (customerIdRaw as any)._id
+          : (customerIdRaw as string);
+
       methods.reset({
-        customerId: orderInfo.customerId || "temp",
-        saleId:
-          (typeof orderInfo.saleId === "object"
-            ? (orderInfo.saleId as any)?._id
-            : orderInfo.saleId) || "temp",
-        note: orderInfo.note || "",
+        customerId: customerId || "",
+        saleId: saleId || "",
+        isGuest: !customerId,
         items: orderInfo.items.map((item: any) => ({
-          productId: item.productId,
+          productId:
+            typeof item.productId === "object"
+              ? item.productId._id
+              : item.productId,
           productNameSnapshot: item.productNameSnapshot,
           unitName: item.unitNameSnapshot || item.unitName,
           quantity: item.quantity,
           price: item.priceUnit,
+          deliveredQuantity: item.deliveredQuantity ?? item.quantity,
+          skuSnapshot: item.skuSnapshot,
           note: item.note,
         })),
+        note: orderInfo.note || "",
       });
     }
   }, [orderInfo, methods]);
@@ -66,15 +83,17 @@ export const ReconcileOrderDialog = ({
 
     const reconcileData = {
       items: data.items.map((item, index) => {
-        // Tìm orderItemId tương ứng nếu có
         const originalItem = orderInfo?.items[index];
         return {
           orderItemId: originalItem?._id,
           productId: item.productId,
           unitName: item.unitName,
           quantity: item.quantity,
+          deliveredQuantity: item.deliveredQuantity,
+          note: item.note,
         };
       }),
+      note: data.note,
     };
 
     onReconcileSingleOrder(orderId, reconcileData, () => {
@@ -97,6 +116,9 @@ export const ReconcileOrderDialog = ({
               </span>
             </div>
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Chỉnh sửa số lượng thực giao cho đơn hàng này để đối soát kho.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto bg-slate-50/50">
@@ -188,7 +210,7 @@ export const ReconcileOrderDialog = ({
             form="reconcile-form"
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 h-10 px-6 shadow-lg shadow-blue-200"
-            disabled={isPending || isLoading}
+            disabled={isPending || (isLoading && !orderInfo)}
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Xác nhận

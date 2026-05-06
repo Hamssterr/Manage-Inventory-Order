@@ -192,11 +192,7 @@ export const CustomerPage = () => {
     <div className="flex flex-col h-full gap-4">
       <FilterBar
         onSearch={handleOnSearch}
-        onAddNew={
-          hasRole(["admin", "owner", "salers"])
-            ? () => handleAddNew()
-            : undefined
-        }
+        onAddNew={handleAddNew}
         filters={[]}
       />
 
@@ -222,7 +218,7 @@ export const CustomerPage = () => {
                   })
                 }
                 onDelete={
-                  hasRole(["admin", "owner"])
+                  hasRole(["admin", "owner", "accountant", "salers"])
                     ? (row) => setCustomerToDelete(row)
                     : undefined
                 }

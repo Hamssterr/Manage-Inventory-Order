@@ -7,7 +7,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Session from "../models/Session.js";
-import { signupSchema, type UpdateUserDto } from "../libs/authValidate.js";
+import {
+  signupSchema,
+  changePasswordSchema,
+  type UpdateUserDto,
+} from "../libs/authValidate.js";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
 
 const ACCESS_TOKEN_TTL = "30d";
@@ -210,9 +214,13 @@ export const getMet = asyncWrapper(async (req: AuthRequest, res: Response) => {
 });
 
 export const updateProfile = asyncWrapper(
-  async (req: Request, res: Response) => {
-    const userId = req.params.id;
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user?._id;
     const updateData: UpdateUserDto = req.body;
+
+    if (!userId) {
+      throw new ErrorResponse("User not found", 404);
+    }
 
     // 1. Kiểm tra tính duy nhất (Unique) một cách an toàn
     const uniqueFields: any[] = [];
@@ -223,7 +231,7 @@ export const updateProfile = asyncWrapper(
     if (uniqueFields.length > 0) {
       const existingUser = await User.findOne({
         $or: uniqueFields,
-        _id: { $ne: new mongoose.Types.ObjectId(userId as string) }, // Loại trừ chính user đang cập nhật
+        _id: { $ne: new mongoose.Types.ObjectId(userId) }, // Loại trừ chính user đang cập nhật
       }).lean();
 
       if (existingUser) {
@@ -239,7 +247,7 @@ export const updateProfile = asyncWrapper(
       userId,
       { $set: updateData },
       {
-        new: true, // Trả về document sau khi update
+        returnDocument: "after", // Trả về document sau khi update (Thay thế cho new: true)
         runValidators: true, // Chạy validation của Mongoose Schema
         context: "query", // Cần thiết cho một số plugin validation
       },
@@ -254,6 +262,61 @@ export const updateProfile = asyncWrapper(
       success: true,
       message: "Updated User successfully",
       user: updatedUser,
+    });
+  },
+);
+
+export const changePassword = asyncWrapper(
+  async (req: AuthRequest, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      throw new ErrorResponse("Not authenticated", 401);
+    }
+
+    const validation = changePasswordSchema.safeParse({ body: req.body });
+    if (!validation.success) {
+      throw new ErrorResponse(validation.error.issues[0].message, 400);
+    }
+
+    const { oldPassword, newPassword } = validation.data.body;
+
+    const currentUser = await User.findById(user._id);
+    if (!currentUser) {
+      throw new ErrorResponse("User not found", 404);
+    }
+
+    const correctPassword = await bcrypt.compare(
+      oldPassword,
+      currentUser.hashedPassword,
+    );
+
+    if (!correctPassword) {
+      throw new ErrorResponse("Old password is incorrect", 400);
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    currentUser.hashedPassword = hashedNewPassword;
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  },
+);
+
+export const uploadAvatar = asyncWrapper(
+  async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+      throw new ErrorResponse("No file uploaded", 400);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "File uploaded successfully",
+      url: req.file.path, // Cloudinary URL
     });
   },
 );

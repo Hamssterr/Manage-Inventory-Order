@@ -13,44 +13,55 @@ import {
 import { getDateRangeQuery } from "../utils/dateHelper.js";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
 
-export const createOrder = asyncWrapper(async (req: Request, res: Response) => {
-  const { customerId, items, note, saleId } = req.body;
+export const createOrder = asyncWrapper(
+  async (req: AuthRequest, res: Response) => {
+    const { customerId, items, note } = req.body;
+    let { saleId } = req.body;
 
-  const customer = await Customer.findById(customerId);
-  if (!customer) {
-    throw new ErrorResponse("Customer not found", 404);
-  }
+    if (req.user?.role === "salers" || !saleId) {
+      saleId = req.user?._id;
+    }
 
-  const orderCode = OrderService.generateOrderCode();
+    if (!saleId) {
+      throw new ErrorResponse("Không xác định nhân viên bán hàng", 400);
+    }
 
-  const fullAddress = `${customer?.addresses?.addressDetail}, ${customer?.addresses?.ward}, ${customer?.addresses?.district}, ${customer?.addresses?.province}`;
-  const routeId = customer?.addresses?.routeId;
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new ErrorResponse("Customer not found", 404);
+    }
 
-  const { processedItems, totalAmount, totalTaxAmount } =
-    await OrderService.processOrderItems(items);
+    const orderCode = OrderService.generateOrderCode();
 
-  const newOrder = await Order.create({
-    orderCode,
-    customerId: customerId,
-    saleId: saleId,
-    customerNameSnapshot: customer.name,
-    customerPhoneSnapshot: customer.phoneNumber,
-    deliveryAddressSnapshot: fullAddress,
-    routeId: routeId,
-    customerTaxCodeSnapshot: customer.taxCode,
-    items: processedItems,
-    totalAmount,
-    totalTaxAmount,
-    note,
-    status: "pending",
-  });
+    const fullAddress = `${customer?.addresses?.addressDetail}, ${customer?.addresses?.ward}, ${customer?.addresses?.district}, ${customer?.addresses?.province}`;
+    const routeId = customer?.addresses?.routeId;
 
-  res.status(200).json({
-    success: true,
-    message: "Create new order successfully",
-    data: newOrder,
-  });
-});
+    const { processedItems, totalAmount, totalTaxAmount } =
+      await OrderService.processOrderItems(items);
+
+    const newOrder = await Order.create({
+      orderCode,
+      customerId: customerId,
+      saleId: saleId,
+      customerNameSnapshot: customer.name,
+      customerPhoneSnapshot: customer.phoneNumber,
+      deliveryAddressSnapshot: fullAddress,
+      routeId: routeId,
+      customerTaxCodeSnapshot: customer.taxCode,
+      items: processedItems,
+      totalAmount,
+      totalTaxAmount,
+      note,
+      status: "pending",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Create new order successfully",
+      data: newOrder,
+    });
+  },
+);
 
 export const createGuestOrder = asyncWrapper(
   async (req: AuthRequest, res: Response) => {
@@ -132,8 +143,9 @@ export const createGuestOrder = asyncWrapper(
 );
 
 export const getAllOrders = asyncWrapper(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
+    const user = req.user;
     const {
       status,
       startDate,
@@ -145,6 +157,11 @@ export const getAllOrders = asyncWrapper(
     } = req.query;
 
     const query: any = {};
+
+    const isRestricted = !["admin", "owner", "accountant"].includes(
+      user?.role || "",
+    );
+    if (isRestricted) query.saleId = user?._id;
 
     if (status) query.status = status;
     if (customerId) query.customerId = customerId;

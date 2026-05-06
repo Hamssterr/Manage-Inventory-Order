@@ -2,10 +2,19 @@ import { QUERY_KEYS } from "@/constants/query-key";
 import {
   authMeFunction,
   signInFunction,
+  signOutFunction,
   signUpFunction,
+  updateProfileFunction,
+  changePasswordFunction,
+  uploadFunction,
 } from "@/services/apis/auth";
 import { useAuthStore } from "@/stores/useAuthStore";
-import type { SignInRequest, SignUpRequest } from "@/types/auth";
+import type {
+  SignInRequest,
+  SignUpRequest,
+  UpdateProfileRequest,
+  ChangePasswordRequest,
+} from "@/types/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +73,70 @@ export const useSignInMutation = () => {
     },
     onError: (error: AxiosError<{ message: string }>) => {
       const message = error.response?.data?.message || "Đăng nhập thất bại";
+      toast.error(message);
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+
+  return useMutation({
+    mutationFn: signOutFunction,
+    onSuccess: () => {
+      logout();
+      toast.success("Đăng xuất thành công");
+      navigate("/sign-in");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error.response?.data?.message || "Đăng xuất thất bại";
+      toast.error(message);
+      // Vẫn logout ở client nếu API lỗi (ví dụ token hết hạn)
+      logout();
+      navigate("/sign-in");
+    },
+  });
+};
+
+export const useUpdateProfileMutation = () => {
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateProfileRequest }) =>
+      updateProfileFunction(id, data),
+    onSuccess: (response) => {
+      // Cập nhật lại thông tin user trong store
+      setAuth(accessToken, response.data.user);
+      toast.success("Cập nhật thông tin thành công");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message =
+        error.response?.data?.message || "Cập nhật thông tin thất bại";
+      toast.error(message);
+    },
+  });
+};
+
+export const useUploadMutation = () => {
+  return useMutation({
+    mutationFn: (data: FormData) => uploadFunction(data),
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error.response?.data?.message || "Upload thất bại";
+      toast.error(message);
+    },
+  });
+};
+
+export const useChangePasswordMutation = () => {
+  return useMutation({
+    mutationFn: (data: ChangePasswordRequest) => changePasswordFunction(data),
+    onSuccess: () => {
+      toast.success("Đổi mật khẩu thành công");
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error.response?.data?.message || "Đổi mật khẩu thất bại";
       toast.error(message);
     },
   });

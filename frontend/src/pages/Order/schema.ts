@@ -6,7 +6,9 @@ export const orderItemSchema = z.object({
   productNameSnapshot: z.string().optional(),
   unitName: z.string().min(1, "Vui lòng chọn đơn vị tính"),
   quantity: z.number().positive("Số lượng phải lớn hơn 0"),
+  deliveredQuantity: z.number().min(0).optional(),
   price: z.number().optional(), // Lưu giá tại thời điểm chọn
+  skuSnapshot: z.string().optional(),
   note: z.string().optional(),
 });
 
@@ -30,19 +32,46 @@ export const createOrderSchema = z
       .array(orderItemSchema)
       .min(1, "Đơn hàng phải có ít nhất 1 sản phẩm"),
   })
-  .refine(
-    (data) => {
-      if (data.isGuest) {
-        return !!data.guestName && !!data.guestPhone && !!data.guestAddress;
+  .superRefine((data, ctx) => {
+    if (data.isGuest) {
+      if (!data.guestName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vui lòng nhập tên khách hàng",
+          path: ["guestName"],
+        });
       }
-      return !!data.customerId && !!data.saleId;
-    },
-    {
-      message:
-        "Vui lòng nhập đầy đủ thông tin khách hàng và nhân viên phụ trách",
-      path: ["customerId"],
-    },
-  );
+      if (!data.guestPhone) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vui lòng nhập số điện thoại",
+          path: ["guestPhone"],
+        });
+      }
+      if (!data.guestAddress) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vui lòng nhập địa chỉ",
+          path: ["guestAddress"],
+        });
+      }
+    } else {
+      if (!data.customerId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vui lòng chọn khách hàng",
+          path: ["customerId"],
+        });
+      }
+      if (!data.saleId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Vui lòng chọn nhân viên phụ trách",
+          path: ["saleId"],
+        });
+      }
+    }
+  });
 
 // Schema cho tạo đơn hàng khách vãng lai (Guest)
 export const createGuestOrderSchema = z.object({

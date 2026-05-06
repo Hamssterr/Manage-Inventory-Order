@@ -19,14 +19,14 @@ export const navigationConfig: NavigationConfig = {
       title: "Kho hàng",
       url: "/inventory",
       icon: "Package",
-      roles: ["admin", "owner", "accountant", "salers"],
+      roles: ["admin", "owner", "accountant"],
       items: [{ title: "Danh sách kho hàng", url: "/inventory" }],
     },
     {
       title: "Đơn hàng",
       url: "/orders",
       icon: "ShoppingCart",
-      roles: ["admin", "owner"],
+      roles: ["admin", "owner", "accountant", "salers"],
       items: [{ title: "Danh sách đơn hàng", url: "/orders" }],
     },
     {

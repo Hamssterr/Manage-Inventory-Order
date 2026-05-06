@@ -82,8 +82,8 @@ export const ExportTicketDetail = () => {
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
             <BreadcrumbLink
-              className="text-muted-foreground text-sm"
-              href="/export-tickets"
+              className="text-muted-foreground text-sm cursor-pointer hover:text-primary"
+              onClick={() => navigate(-1)}
             >
               Danh sách phiếu xuất
             </BreadcrumbLink>

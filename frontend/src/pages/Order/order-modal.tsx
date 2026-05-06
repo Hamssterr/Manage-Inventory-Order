@@ -10,11 +10,13 @@ import { OrderSummaryCard } from "./components/order-summary-card";
 import { OrderNoteCard } from "./components/order-note-card";
 import { useEffect } from "react";
 import type { IOrder } from "@/types/order";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export const OrderModal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { user } = useAuthStore();
 
   const isEditMode = location.pathname.includes("edit") && !!id;
   const { onOrderSubmit, onGuestOrderSubmit, isPending } = useOrderActions(id);
@@ -35,7 +37,7 @@ export const OrderModal = () => {
       guestPhone: "",
       guestAddress: "",
       guestTaxCode: "",
-      saleId: "",
+      saleId: user?.role === "salers" ? user._id : "",
       items: [],
       note: "",
     },
@@ -43,7 +45,7 @@ export const OrderModal = () => {
 
   // Tự động điền dữ liệu khi có dữ liệu (từ State hoặc API)
   useEffect(() => {
-    const dataToReset = stateOrder || orderDetail;
+    const dataToReset = stateOrder || orderDetail?.data;
 
     if (isEditMode && dataToReset) {
       const saleIdRaw = dataToReset.saleId;
@@ -52,15 +54,25 @@ export const OrderModal = () => {
           ? saleIdRaw._id
           : (saleIdRaw as string);
 
+      const customerIdRaw = dataToReset.customerId;
+      const customerId =
+        typeof customerIdRaw === "object" && customerIdRaw !== null
+          ? (customerIdRaw as any)._id
+          : (customerIdRaw as string);
+
       methods.reset({
-        customerId: dataToReset.customerId || "",
+        isGuest: !customerId,
+        customerId: customerId || "",
         customerNameSnapshot: dataToReset.customerNameSnapshot
           ? `${dataToReset.customerNameSnapshot} - ${dataToReset.customerPhoneSnapshot || ""}`
           : "",
         saleId: saleId || "",
         note: dataToReset.note || "",
         items: dataToReset.items.map((item: any) => ({
-          productId: item.productId,
+          productId:
+            typeof item.productId === "object"
+              ? item.productId._id
+              : item.productId,
           productNameSnapshot: item.productNameSnapshot,
           unitName: item.unitNameSnapshot || item.unitName,
           quantity: item.quantity,
@@ -70,6 +82,17 @@ export const OrderModal = () => {
       });
     }
   }, [isEditMode, orderDetail, stateOrder, methods]);
+
+  // Đảm bảo saleId luôn được điền cho nhân viên sale khi tạo mới
+  useEffect(() => {
+    if (
+      !isEditMode &&
+      user?.role === "salers" &&
+      !methods.getValues("saleId")
+    ) {
+      methods.setValue("saleId", user._id);
+    }
+  }, [user, isEditMode, methods]);
 
   const handleCancel = () => {
     navigate("/orders");

@@ -4,6 +4,8 @@ import {
   getSalerRevenueReport,
   getDashboardStats,
   getChartData,
+  getSalerRevenueDataReport,
+  getTopSellingProducts,
 } from "../controllers/reportControllers.js";
 import { protectAuth, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -22,16 +24,31 @@ router.get(
   getSalerRevenueReport,
 );
 router.get(
-  "/dashboard-stats",
+  "/salers-data/:saleId",
   protectAuth,
   restrictTo("admin", "owner", "accountant"),
+  getSalerRevenueDataReport,
+);
+
+router.get(
+  "/dashboard-stats",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant", "salers"),
   getDashboardStats,
 );
 router.get(
   "/chart",
   protectAuth,
-  restrictTo("admin", "owner", "accountant"),
+  restrictTo("admin", "owner", "accountant", "salers"),
   getChartData,
+);
+
+// Self report
+router.get(
+  "/salers-revenue",
+  protectAuth,
+  restrictTo("salers"),
+  getTopSellingProducts,
 );
 
 export default router;

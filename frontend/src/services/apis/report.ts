@@ -1,8 +1,15 @@
 import type {
   BarChartDataResponse,
   DashboardStatsResponse,
+  SalerRevenueDataResponse,
+  SellingProductsResponse,
 } from "@/types/report";
-import { GetBarChartData, GetDashboardStats } from "@/constants/api-endpoints";
+import {
+  GetBarChartData,
+  GetDashboardStats,
+  GetSalerRevenueData,
+  GetSalerSellingProducts,
+} from "@/constants/api-endpoints";
 import http from "../base";
 
 export const getDashboardStats = () => {
@@ -15,4 +22,20 @@ export const getBarChartData = (params: any) => {
 
 export const getGeneralSalesReport = (params: any) => {
   return http.get("/reports/general", { params });
+};
+
+export const getSalerRevenueData = ({
+  params,
+  id,
+}: {
+  params: any;
+  id: string;
+}) => {
+  return http.get<SalerRevenueDataResponse>(`${GetSalerRevenueData}/${id}`, {
+    params,
+  });
+};
+
+export const getSalerSellingProducts = (params: any) => {
+  return http.get<SellingProductsResponse>(GetSalerSellingProducts, { params });
 };

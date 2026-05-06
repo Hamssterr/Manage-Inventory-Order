@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Save, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderActionsProps {
   isPending: boolean;
@@ -26,6 +27,7 @@ export const HeaderActions = ({
   isEditMode,
   isImportMode,
 }: HeaderActionsProps) => {
+  const navigate = useNavigate();
   const getTitle = () => {
     if (isViewMode) return "Chi tiết sản phẩm";
     if (isEditMode) return "Cập nhật sản phẩm";
@@ -40,7 +42,12 @@ export const HeaderActions = ({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem className="hidden md:block">
-            <BreadcrumbLink href="/inventory">Danh sách tồn kho</BreadcrumbLink>
+            <BreadcrumbLink
+              onClick={() => navigate(-1)}
+              className="cursor-pointer hover:text-primary"
+            >
+              Danh sách tồn kho
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden md:block" />
           <BreadcrumbItem>

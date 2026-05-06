@@ -256,7 +256,7 @@ export const useOrderActions = (id?: string) => {
 
   const handleSuccess = (msg: string) => {
     toast.success(msg);
-    if (!id) navigate("/orders");
+    navigate("/orders");
   };
 
   const handleError = (error: any, defaultMsg: string) => {

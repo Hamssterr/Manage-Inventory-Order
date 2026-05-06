@@ -13,9 +13,6 @@ interface FailedRequest {
 const config: AxiosRequestConfig = {
   baseURL: `${import.meta.env.VITE_API_URL}`, // Prefix URL của bạn
   timeout: 10000, // Timeout sau 10 giây nếu server không phản hồi
-  headers: {
-    "Content-Type": "application/json",
-  },
   withCredentials: true,
 };
 
@@ -145,11 +142,11 @@ class Http {
     return this.instance.get<T>(url, config);
   }
 
-  post<T>(url: string, data?: object, config?: AxiosRequestConfig) {
+  post<T>(url: string, data?: any, config?: AxiosRequestConfig) {
     return this.instance.post<T>(url, data, config);
   }
 
-  put<T>(url: string, data?: object, config?: AxiosRequestConfig) {
+  put<T>(url: string, data?: any, config?: AxiosRequestConfig) {
     return this.instance.put<T>(url, data, config);
   }
 
@@ -157,7 +154,7 @@ class Http {
     return this.instance.delete<T>(url, config);
   }
 
-  patch<T>(url: string, data?: object, config?: AxiosRequestConfig) {
+  patch<T>(url: string, data?: any, config?: AxiosRequestConfig) {
     return this.instance.patch<T>(url, data, config);
   }
 }

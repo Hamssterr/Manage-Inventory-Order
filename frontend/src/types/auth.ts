@@ -48,3 +48,32 @@ export interface AuthMeResponse {
   message: string;
   data: User;
 }
+
+export interface UpdateProfileRequest {
+  displayName?: string;
+  email?: string;
+  phoneNumber?: string;
+  avatarUrl?: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword?: string;
+  newPassword?: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface UploadResponse {
+  success: boolean;
+  message: string;
+  url: string;
+}

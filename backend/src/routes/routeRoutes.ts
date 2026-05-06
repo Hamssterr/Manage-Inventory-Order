@@ -14,7 +14,7 @@ router.post("/add", protectAuth, restrictTo("admin", "owner"), createRoute);
 router.get(
   "/",
   protectAuth,
-  restrictTo("admin", "owner", "sale"),
+  restrictTo("admin", "owner", "salers"),
   getRouteList,
 );
 router.put("/:id", protectAuth, restrictTo("admin", "owner"), updateRoute);

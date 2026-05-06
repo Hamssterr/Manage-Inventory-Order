@@ -7,6 +7,7 @@ import User from "../models/User.js";
 
 export interface AuthRequest extends Request {
   user?: IUser;
+  file?: Express.Multer.File;
 }
 
 export const protectAuth = asyncWrapper(

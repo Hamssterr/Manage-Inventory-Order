@@ -16,7 +16,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { Eye, MoreHorizontal, Plus, SquarePen, Trash2 } from "lucide-react";
+import {
+  Eye,
+  File,
+  MoreHorizontal,
+  Plus,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
 
 export interface ColumnDef<T> {
   header: string;
@@ -221,7 +228,16 @@ export function TableData<T extends { id: string | number }>({
                 colSpan={columns.length + (enableSelection ? 2 : 1)}
                 className="h-24 text-center"
               >
-                Không có dữ liệu.
+                <div className="py-14 text-center border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30 flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                    <File className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-slate-500 font-bold text-[14px]">
+                      Không có dữ liệu
+                    </p>
+                  </div>
+                </div>
               </TableCell>
             </TableRow>
           )}

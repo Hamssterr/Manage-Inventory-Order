@@ -10,8 +10,19 @@ import {
 
 export const createCustomer = asyncWrapper(
   async (req: AuthRequest, res: Response) => {
-    const { name, taxCode, phoneNumber, addresses, saleReps } = req.body;
+    const { name, taxCode, phoneNumber, addresses } = req.body;
+    let { saleReps } = req.body;
     const userId = req.user?._id;
+
+    if (!userId) throw new ErrorResponse("Người dùng không xác định", 401);
+
+    const isRestricted = !["admin", "owner", "accountant"].includes(
+      req.user?.role || "",
+    );
+
+    if (isRestricted) {
+      saleReps = [userId];
+    }
 
     const existingCustomer = await Customer.findOne({
       $or: [
@@ -27,6 +38,12 @@ export const createCustomer = asyncWrapper(
         "Khách hàng với số điện thoại hoặc MST này đã tồn tại",
         400,
       );
+    }
+
+    if (!saleReps) {
+      saleReps = [];
+    } else if (!Array.isArray(saleReps)) {
+      saleReps = [saleReps];
     }
 
     let finalSaleReps: string[] = [];
@@ -59,11 +76,21 @@ export const createCustomer = asyncWrapper(
 );
 
 export const getAllCustomer = asyncWrapper(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const { page, limit, skip } = getPaginationParams(req);
     const { search } = req.query;
+    const user = req.user;
 
     const query: any = {};
+
+    const isRestricted = !["admin", "owner", "accountant"].includes(
+      user?.role || "",
+    );
+
+    if (isRestricted) {
+      query.saleReps = user?._id;
+    }
+
     if (search) {
       query.$or = [
         { name: { $regex: search as string, $options: "i" } },

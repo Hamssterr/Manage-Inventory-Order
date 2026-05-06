@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Truck, XCircle, X, Undo2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePermission } from "@/hooks/usePermission";
+import type { UserRole } from "@/types/user";
 
 interface OrderBulkActionsProps {
   status: string;
@@ -22,6 +24,7 @@ type BulkActionDef = {
     | "ghost"
     | "link";
   className?: string;
+  roles?: UserRole[];
 };
 
 export const OrderBulkActions = ({
@@ -31,6 +34,7 @@ export const OrderBulkActions = ({
   onAction,
   isPending,
 }: OrderBulkActionsProps) => {
+  const { hasRole } = usePermission();
   if (selectedIds.length === 0) return null;
 
   const ACTION_CONFIG: Record<string, BulkActionDef[]> = {
@@ -40,6 +44,7 @@ export const OrderBulkActions = ({
         icon: Check,
         nextStatus: "confirmed",
         className: "bg-green-600 hover:bg-green-700 shadow-green-500/20",
+        roles: ["admin", "owner", "accountant"],
       },
       {
         label: () => "Hủy đơn",
@@ -54,6 +59,7 @@ export const OrderBulkActions = ({
         icon: Truck,
         nextStatus: "shipping",
         className: "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20",
+        roles: ["admin", "owner", "accountant"],
       },
       {
         label: () => "Hủy đơn",
@@ -68,12 +74,14 @@ export const OrderBulkActions = ({
         icon: Check,
         nextStatus: "delivered",
         className: "bg-green-600 hover:bg-green-700 shadow-green-500/20",
+        roles: ["admin", "owner", "accountant"],
       },
       {
         label: () => "Không lấy",
         icon: XCircle,
         nextStatus: "cancelled",
         variant: "destructive",
+        roles: ["admin", "owner", "accountant"],
       },
     ],
     delivered: [
@@ -82,6 +90,7 @@ export const OrderBulkActions = ({
         icon: Undo2,
         nextStatus: "confirmed",
         className: "bg-green-600 hover:bg-green-700 shadow-green-500/20",
+        roles: ["admin", "owner", "accountant"],
       },
     ],
     cancelled: [
@@ -90,6 +99,7 @@ export const OrderBulkActions = ({
         icon: Undo2,
         nextStatus: "confirmed",
         className: "bg-green-600 hover:bg-green-700 shadow-green-500/20",
+        roles: ["admin", "owner", "accountant"],
       },
     ],
     "": [
@@ -98,6 +108,7 @@ export const OrderBulkActions = ({
         icon: XCircle,
         nextStatus: "delete",
         variant: "destructive",
+        roles: ["admin", "owner"],
       },
     ],
   };
@@ -130,27 +141,29 @@ export const OrderBulkActions = ({
             <span className="hidden sm:inline text-xs sm:text-sm">Bỏ chọn</span>
           </Button>
 
-          {currentAction.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <Button
-                key={action.nextStatus + index}
-                variant={action.variant || "default"}
-                size={"sm"}
-                className={cn(
-                  "h-8 sm:h-9 px-3 sm:px-4 shadow-lg transition-all active:scale-95 whitespace-nowrap text-xs sm:text-sm",
-                  action.className,
-                )}
-                disabled={isPending}
-                onClick={() => onAction(selectedIds, action.nextStatus)}
-              >
-                <Icon className="h-3.5 w-3.5 sm:mr-2" />
-                <span>
-                  {isPending ? "..." : action.label(selectedIds.length)}
-                </span>
-              </Button>
-            );
-          })}
+          {currentAction
+            .filter((action) => !action.roles || hasRole(action.roles))
+            .map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <Button
+                  key={action.nextStatus + index}
+                  variant={action.variant || "default"}
+                  size={"sm"}
+                  className={cn(
+                    "h-8 sm:h-9 px-3 sm:px-4 shadow-lg transition-all active:scale-95 whitespace-nowrap text-xs sm:text-sm",
+                    action.className,
+                  )}
+                  disabled={isPending}
+                  onClick={() => onAction(selectedIds, action.nextStatus)}
+                >
+                  <Icon className="h-3.5 w-3.5 sm:mr-2" />
+                  <span>
+                    {isPending ? "..." : action.label(selectedIds.length)}
+                  </span>
+                </Button>
+              );
+            })}
         </div>
       </div>
     </div>

@@ -22,14 +22,14 @@ const router: Router = express.Router();
 router.post(
   "/guest",
   protectAuth,
-  restrictTo("admin", "owner", "salers"),
+  restrictTo("admin", "owner", "accountant", "salers"),
   createGuestOrder,
 );
 
 router.post(
   "/add",
   protectAuth,
-  restrictTo("admin", "owner", "salers"),
+  restrictTo("admin", "owner", "accountant", "salers"),
   createOrder,
 );
 
