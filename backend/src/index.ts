@@ -9,19 +9,28 @@ import inventoryRoutes from "./routes/inventoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import routeRoutes from "./routes/routeRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import employeeRoutes from "./routes/employeeRoutes.js";
 import exportTicketRoutes from "./routes/exportTicketRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { seedAdminUser } from "./utils/seedAdmin.js";
+import { applySecurityMiddlewares, limiter } from "./middlewares/security.js";
 
 dotenv.config();
 
 const app: Express = express();
 const PORT: number = parseInt(process.env.PORT as string, 10) || 5000;
 
+// 1. Áp dụng các lớp bảo mật HTTP Headers, NoSQL Sanitize, và Trust Proxy
+applySecurityMiddlewares(app);
+
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(express.json());
+// 2. Giới hạn dung lượng JSON payload đầu vào (chống OOM)
+app.use(express.json({ limit: "20kb" }));
 app.use(cookieParser());
+
+// 3. Áp dụng Rate Limiting chung cho toàn bộ các route /api
+app.use("/api", limiter);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
@@ -29,12 +38,14 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/routes", routeRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/employees", employeeRoutes);
 app.use("/api/export-tickets", exportTicketRoutes);
 app.use("/api/reports", reportRoutes);
 app.use(errorHandler);
 
-connectDB().then(() => {
+connectDB().then(async () => {
+  await seedAdminUser();
+
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });

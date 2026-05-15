@@ -51,3 +51,33 @@ export interface ISellingProduct {
 }
 
 export type SellingProductsResponse = BaseDetailResponse<ISellingProduct[]>;
+
+// Saler Salary
+export interface SalerSalaryParams {
+  month: number;
+  year: number;
+}
+
+export interface ISalaryProduct {
+  productId: string;
+  productName: string;
+  unitName: string;
+  totalQuantity: number;
+  totalSalary: number;
+}
+
+export interface ISalarySummary {
+  userName: string;
+  phoneNumber: string;
+  month: number;
+  year: number;
+  totalProductsSold: number;
+  totalSalary: number;
+}
+
+export interface SalerSalaryData {
+  summary: ISalarySummary;
+  products: ISalaryProduct[];
+}
+
+export type SalerSalaryResponse = BaseDetailResponse<SalerSalaryData>;

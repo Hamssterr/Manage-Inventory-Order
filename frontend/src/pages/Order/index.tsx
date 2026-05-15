@@ -57,7 +57,7 @@ export const OrderPage = () => {
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
   const routeId = searchParams.get("routeId") || "";
-  const status = searchParams.get("status") || "";
+  const status = searchParams.get("status") || "";  
   const startDateStr = searchParams.get("startDate");
   const endDateStr = searchParams.get("endDate");
   const limit = Number(searchParams.get("limit")) || 15;

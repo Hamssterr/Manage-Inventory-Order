@@ -3,7 +3,8 @@ import { SiteHeader } from "./site-header";
 import { RevenueBarChart } from "./revenue-bar-chart";
 import { RevenueSalesBarChart } from "./revenue-sales-bar-chart";
 import { usePermission } from "@/hooks/usePermission";
-import { SalerSellingProducts } from "./components/saler-selling-products";
+import { SalerSellingProducts } from "./saler-selling-products";
+import { SalarySales } from "./salary-sales";
 
 export const HomePage = () => {
   const { hasRole } = usePermission();
@@ -28,8 +29,9 @@ export const HomePage = () => {
           )}
 
           {hasRole(["salers"]) && (
-            <div className="w-full">
+            <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-4">
               <SalerSellingProducts />
+              <SalarySales />
             </div>
           )}
         </div>

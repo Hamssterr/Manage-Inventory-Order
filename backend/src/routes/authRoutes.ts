@@ -11,11 +11,12 @@ import {
 } from "../controllers/authControllers.js";
 import { protectAuth } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
+import { authLimiter } from "../middlewares/security.js";
 
 const router: Router = express.Router();
 
 router.post("/signup", signup);
-router.post("/signin", signin);
+router.post("/signin", authLimiter, signin);
 router.post("/refreshToken", refreshToken);
 router.post("/logout", logout);
 

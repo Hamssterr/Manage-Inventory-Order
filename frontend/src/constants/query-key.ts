@@ -9,4 +9,5 @@ export const QUERY_KEYS = {
   ORDERS: "Orders",
   EXPORT_TICKETS: "ExportTickets",
   REPORTS: "Reports",
+  EMPLOYEES: "Employees",
 };

@@ -7,6 +7,7 @@ import { buildChartConfig, fillChartDataGaps } from "../utils/dateHelper.js";
 import { ErrorResponse } from "../utils/ErrorResponse.js";
 import mongoose from "mongoose";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
+import User from "../models/User.js";
 
 export const getGeneralSalesReport = asyncWrapper(
   async (req: Request, res: Response) => {
@@ -405,5 +406,93 @@ export const getTopSellingProducts = asyncWrapper(
     ]);
 
     res.status(200).json({ success: true, data: stats });
+  },
+);
+
+// Salary Report
+export const getSalaryReport = asyncWrapper(
+  async (req: AuthRequest, res: Response) => {
+    const user = req.user;
+
+    if (!user) {
+      throw new ErrorResponse("Người dùng không xác định", 401);
+    }
+
+    const { month, year, saleId } = req.query;
+
+    const targetMonth = month
+      ? parseInt(month as string) - 1
+      : new Date().getMonth();
+    const targetYear = year
+      ? parseInt(year as string)
+      : new Date().getFullYear();
+    const startDate = new Date(targetYear, targetMonth, 1);
+    const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59);
+
+    const matchQuery: any = {
+      saleId: user._id,
+      status: { $in: ["delivered", "completed"] },
+      createdAt: { $gte: startDate, $lte: endDate },
+    };
+
+    const [infoUser, salaryReport] = await Promise.all([
+      User.findById(user).select("displayName phoneNumber").lean(),
+      Order.aggregate([
+        { $match: matchQuery },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: {
+              productId: "$items.productId",
+              unitName: "$items.unitNameSnapshot",
+            },
+            productName: { $first: "$items.productNameSnapshot" },
+            unitName: { $first: "$items.unitNameSnapshot" },
+            totalQuantity: { $sum: "$items.quantity" },
+            totalSalary: {
+              $sum: {
+                $multiply: [
+                  "$items.quantity",
+                  { $ifNull: ["$items.salaryPerUnitSnapshot", 0] },
+                ],
+              },
+            },
+          },
+        },
+        { $sort: { totalSalary: -1 } },
+      ]),
+    ]);
+
+    let grandTotalSalary = 0;
+    let grandTotalProducts = 0;
+
+    const formattedReport = salaryReport.map((item) => {
+      grandTotalProducts += item.totalQuantity;
+      grandTotalSalary += item.totalSalary;
+      return {
+        productId: item._id.productId,
+        productName: item.productName,
+        unitName: item.unitName,
+        totalQuantity: item.totalQuantity,
+        totalSalary: item.totalSalary,
+        displayText: `${item.totalQuantity} ${item.unitName?.charAt(0).toUpperCase() + item.unitName?.slice(1)} ${item.productName}: ${item.totalSalary.toLocaleString("vi-VN")}đ`,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Lấy báo cáo lương thành công",
+      data: {
+        summary: {
+          userName: infoUser?.displayName,
+          phoneNumber: infoUser?.phoneNumber,
+          month: targetMonth + 1,
+          year: targetYear,
+          totalProductsSold: grandTotalProducts,
+          totalSalary: grandTotalSalary,
+        },
+        products: formattedReport,
+      },
+    });
   },
 );

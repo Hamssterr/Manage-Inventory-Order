@@ -23,6 +23,8 @@ import {
   Plus,
   SquarePen,
   Trash2,
+  KeyRound,
+  FileDown,
 } from "lucide-react";
 
 export interface ColumnDef<T> {
@@ -39,10 +41,13 @@ interface TableDataProps<T> {
   onUpdate?: (row: T) => void;
   onDelete?: (row: T) => void;
   onImport?: (row: T) => void;
+  onResetPassword?: (row: T) => void;
+  onExport?: (row: T) => void;
   enableSelection?: boolean; // Enable checkbox selection
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
   actionWidth?: string;
+  showAction?: boolean;
 }
 
 export function TableData<T extends { id: string | number }>({
@@ -52,11 +57,24 @@ export function TableData<T extends { id: string | number }>({
   onUpdate,
   onDelete,
   onImport,
+  onResetPassword,
+  onExport,
   enableSelection = false,
   selectedIds = [],
   onSelectionChange,
   actionWidth = "w-[80px]",
+  showAction,
 }: TableDataProps<T>) {
+  const hasActions = !!(
+    onView ||
+    onUpdate ||
+    onDelete ||
+    onImport ||
+    onResetPassword ||
+    onExport
+  );
+  const shouldShowAction = showAction ?? hasActions;
+
   const isAllSelected =
     data.length > 0 &&
     data.every((item) => selectedIds.includes(String(item.id)));
@@ -105,19 +123,21 @@ export function TableData<T extends { id: string | number }>({
                 />
               </TableHead>
             )}
-            <TableHead
-              className={cn(
-                actionWidth,
-                "text-center font-bold text-slate-800 uppercase text-[11px] tracking-wider bg-slate-50/50 border-b-0",
-              )}
-            >
-              Thao tác
-            </TableHead>
+            {shouldShowAction && (
+              <TableHead
+                className={cn(
+                  actionWidth,
+                  "text-center font-bold text-slate-800 uppercase text-[11px] tracking-wider bg-slate-50/50 border-b-0",
+                )}
+              >
+                Thao tác
+              </TableHead>
+            )}
             {columns.map((column, index) => (
               <TableHead
                 key={index}
                 className={cn(
-                  "font-bold whitespace-nowrap py-4",
+                  "font-bold whitespace-nowrap py-4 text-[11px] uppercase text-slate-500",
                   column.className,
                 )}
               >
@@ -146,65 +166,87 @@ export function TableData<T extends { id: string | number }>({
                   </TableCell>
                 )}
                 {/* Action column */}
-                <TableCell className="align-middle py-4 text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-200/50 transition-all duration-200 focus-visible:ring-0"
+                {shouldShowAction && (
+                  <TableCell className="align-middle py-4 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-200/50 transition-all duration-200 focus-visible:ring-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Hành động</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        side="right"
+                        align="start"
+                        sideOffset={8}
+                        className="w-[180px] p-1.5 rounded-xl shadow-xl border-slate-200/60 bg-white/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200"
                       >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Hành động</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      side="right"
-                      align="start"
-                      sideOffset={8}
-                      className="w-[180px] p-1.5 rounded-xl shadow-xl border-slate-200/60 bg-white/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200"
-                    >
-                      {onView && (
-                        <DropdownMenuItem
-                          onClick={() => onView(row)}
-                          className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-blue-50 focus:text-blue-600"
-                        >
-                          <Eye className="mr-2 h-4 w-4 opacity-70" />
-                          <span className="font-medium">Xem chi tiết</span>
-                        </DropdownMenuItem>
-                      )}
-                      {onUpdate && (
-                        <DropdownMenuItem
-                          onClick={() => onUpdate(row)}
-                          className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-amber-50 focus:text-amber-600"
-                        >
-                          <SquarePen className="mr-2 h-4 w-4 opacity-70" />
-                          <span className="font-medium">Cập nhật</span>
-                        </DropdownMenuItem>
-                      )}
-                      {onImport && (
-                        <DropdownMenuItem
-                          onClick={() => onImport(row)}
-                          className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-emerald-50 focus:text-emerald-600"
-                        >
-                          <Plus className="mr-2 h-4 w-4 opacity-70" />
-                          <span className="font-medium">Nhập kho</span>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator className="my-1.5 opacity-50" />
-                      {onDelete && (
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => onDelete(row)}
-                          className="rounded-lg py-2 cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4 opacity-70" />
-                          <span className="font-medium">Xóa dữ liệu</span>
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                        {onView && (
+                          <DropdownMenuItem
+                            onClick={() => onView(row)}
+                            className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-blue-50 focus:text-blue-600"
+                          >
+                            <Eye className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">Xem chi tiết</span>
+                          </DropdownMenuItem>
+                        )}
+                        {onUpdate && (
+                          <DropdownMenuItem
+                            onClick={() => onUpdate(row)}
+                            className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-amber-50 focus:text-amber-600"
+                          >
+                            <SquarePen className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">Cập nhật</span>
+                          </DropdownMenuItem>
+                        )}
+                        {onImport && (
+                          <DropdownMenuItem
+                            onClick={() => onImport(row)}
+                            className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-emerald-50 focus:text-emerald-600"
+                          >
+                            <Plus className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">Nhập kho</span>
+                          </DropdownMenuItem>
+                        )}
+                        {onResetPassword && (
+                          <DropdownMenuItem
+                            onClick={() => onResetPassword(row)}
+                            className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-indigo-50 focus:text-indigo-600"
+                          >
+                            <KeyRound className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">Reset mật khẩu</span>
+                          </DropdownMenuItem>
+                        )}
+                        {onExport && (
+                          <DropdownMenuItem
+                            onClick={() => onExport(row)}
+                            className="rounded-lg py-2 cursor-pointer transition-colors focus:bg-blue-50 focus:text-blue-600"
+                          >
+                            <FileDown className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">
+                              Xuất dữ liệu lương
+                            </span>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator className="my-1.5 opacity-50" />
+                        {onDelete && (
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => onDelete(row)}
+                            className="rounded-lg py-2 cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4 opacity-70" />
+                            <span className="font-medium">Xóa dữ liệu</span>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                )}
                 {/* {Data column} */}
                 {columns.map((column, index) => (
                   <TableCell
@@ -225,7 +267,11 @@ export function TableData<T extends { id: string | number }>({
           ) : (
             <TableRow>
               <TableCell
-                colSpan={columns.length + (enableSelection ? 2 : 1)}
+                colSpan={
+                  columns.length +
+                  (enableSelection ? 1 : 0) +
+                  (shouldShowAction ? 1 : 0)
+                }
                 className="h-24 text-center"
               >
                 <div className="py-14 text-center border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30 flex flex-col items-center gap-3">

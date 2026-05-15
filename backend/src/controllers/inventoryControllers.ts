@@ -43,6 +43,7 @@ export const createInventoryProduct = asyncWrapper(
         exchangeValue: Number(u.exchangeValue),
         priceDefault: Number(u.priceDefault || 0),
         tax: Number(u.tax || 0),
+        salaryPerUnit: Number(u.salaryPerUnit || 0),
         isDefault: Boolean(u.isDefault),
       }));
 
@@ -230,10 +231,12 @@ export const updateInventoryProduct = asyncWrapper(
         throw new ErrorResponse("Product must have at least 1 unit", 400);
       }
 
-      const processedUnits = units.map((unit) => ({
+      const processedUnits = units.map((unit: any) => ({
         unitName: unit.unitName.trim().toLowerCase(),
         exchangeValue: Number(unit.exchangeValue),
         priceDefault: Number(unit.priceDefault || 0),
+        tax: Number(unit.tax || 0),
+        salaryPerUnit: Number(unit.salaryPerUnit || 0),
         isDefault: Boolean(unit.isDefault),
       }));
 

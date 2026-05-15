@@ -5,6 +5,7 @@ export interface IProductUnit {
   exchangeValue: number;
   priceDefault?: number;
   tax?: number;
+  salaryPerUnit?: number;
   isDefault: boolean;
 }
 
@@ -46,6 +47,10 @@ const ProductUnitSchema = new Schema<IProductUnit>(
       default: 0,
     },
     tax: {
+      type: Number,
+      default: 0,
+    },
+    salaryPerUnit: {
       type: Number,
       default: 0,
     },

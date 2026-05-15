@@ -22,6 +22,7 @@ import { OrderTaxInvoice } from "./pages/Order/order-tax-invoice";
 import { ExportTicketPage } from "./pages/Export-Ticket";
 import { ExportTicketDetail } from "./pages/Export-Ticket/export-ticket-details";
 import { ProfilePage } from "./pages/Profile";
+import { EmployeePage } from "./pages/Employee";
 
 export const AppRoutes = () => {
   const element = useRoutes([
@@ -54,8 +55,8 @@ export const AppRoutes = () => {
                   element: <div>Chào mừng sếp lớn Admin/Owner!</div>,
                 },
                 {
-                  path: "admin/users",
-                  element: <div>Trang quản lý nhân viên</div>,
+                  path: "employees",
+                  element: <EmployeePage />,
                 },
               ],
             },
@@ -95,7 +96,10 @@ export const AppRoutes = () => {
                 { path: "orders", element: <OrderPage /> },
                 { path: "orders/add", element: <OrderModal /> },
                 { path: "orders/:id", element: <OrderInvoiceDetails /> },
-                { path: "orders/:id/tax-invoice", element: <OrderTaxInvoice /> },
+                {
+                  path: "orders/:id/tax-invoice",
+                  element: <OrderTaxInvoice />,
+                },
                 { path: "orders/:id/edit", element: <OrderModal /> },
 
                 // Export-Tickets

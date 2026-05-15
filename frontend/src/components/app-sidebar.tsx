@@ -1,7 +1,5 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
-
-import { SearchForm } from "@/components/search-form";
 import {
   Collapsible,
   CollapsibleContent,
@@ -21,18 +19,19 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  GalleryVerticalEndIcon,
   ChevronRight,
   ChevronDown,
   Home,
   Package,
   ShoppingCart,
+  FileUser,
   Users,
   Navigation,
   ScrollText,
 } from "lucide-react";
 import { usePermission } from "@/hooks/usePermission";
 import { navigationConfig } from "@/constants/navigation";
+import logoImg from "@/assets/logo.jpeg";
 
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Home,
@@ -41,6 +40,7 @@ const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Users,
   Navigation,
   ScrollText,
+  FileUser,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -63,7 +63,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEndIcon className="size-4" />
+                  <img
+                    src={logoImg}
+                    alt="logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">Quản Lý Kho</span>

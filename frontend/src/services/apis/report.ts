@@ -2,12 +2,15 @@ import type {
   BarChartDataResponse,
   DashboardStatsResponse,
   SalerRevenueDataResponse,
+  SalerSalaryParams,
+  SalerSalaryResponse,
   SellingProductsResponse,
 } from "@/types/report";
 import {
   GetBarChartData,
   GetDashboardStats,
   GetSalerRevenueData,
+  GetSalerSalary,
   GetSalerSellingProducts,
 } from "@/constants/api-endpoints";
 import http from "../base";
@@ -38,4 +41,8 @@ export const getSalerRevenueData = ({
 
 export const getSalerSellingProducts = (params: any) => {
   return http.get<SellingProductsResponse>(GetSalerSellingProducts, { params });
+};
+
+export const getSalerSalary = (params: SalerSalaryParams) => {
+  return http.get<SalerSalaryResponse>(GetSalerSalary, { params });
 };

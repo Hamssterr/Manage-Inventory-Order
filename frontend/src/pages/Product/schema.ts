@@ -10,6 +10,7 @@ export const unitSchema = z.object({
   exchangeValue: z.number().min(1, "Quy đổi tối thiểu là 1"),
   priceDefault: z.number().min(0, "Giá không được âm"),
   tax: z.number().min(0, "Thuế không được âm"),
+  salaryPerUnit: z.number().min(0, "Lương không được âm"),
   isDefault: z.boolean(),
 });
 

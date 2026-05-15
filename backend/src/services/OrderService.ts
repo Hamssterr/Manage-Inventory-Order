@@ -51,7 +51,7 @@ class OrderService {
       const subTotal = item.quantity * priceUnit;
 
       // Tính thuế: Chỉ tính nếu sản phẩm là sản phẩm bán
-      const taxAmountSnapshot = product.isSale ? (unitInfo.tax || 0) : 0;
+      const taxAmountSnapshot = product.isSale ? unitInfo.tax || 0 : 0;
       const itemTotalTax = taxAmountSnapshot * item.quantity;
 
       processedItems.push({
@@ -60,6 +60,7 @@ class OrderService {
         productNameSnapshot: product.name,
         unitNameSnapshot: unitInfo.unitName,
         exchangeValueSnapshot: unitInfo.exchangeValue,
+        salaryPerUnitSnapshot: unitInfo.salaryPerUnit,
         taxAmountSnapshot: taxAmountSnapshot,
         quantity: item.quantity,
         priceUnit,

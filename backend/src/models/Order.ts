@@ -14,7 +14,8 @@ export interface IOrderItem {
   priceUnit: number;
   subTotal: number;
   isGift: boolean;
-  promotionId?: mongoose.Types.ObjectId; // ID chương trình khuyến mãi (nếu có)
+  salaryPerUnitSnapshot: number;
+  promotionId?: mongoose.Types.ObjectId;
 }
 
 export interface IOrder extends Document {
@@ -57,6 +58,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
   priceUnit: { type: Number, required: true, min: 0 },
   subTotal: { type: Number, required: true },
   isGift: { type: Boolean, default: false },
+  salaryPerUnitSnapshot: { type: Number, required: true, default: 0 },
   promotionId: { type: Schema.Types.ObjectId, ref: "Promotion" },
 });
 

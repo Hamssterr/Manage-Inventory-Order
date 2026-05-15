@@ -44,6 +44,13 @@ export const navigationConfig: NavigationConfig = {
       items: [{ title: "Danh sách khách hàng", url: "/customers" }],
     },
     {
+      title: "Nhân viên",
+      url: "/employees",
+      icon: "FileUser",
+      roles: ["admin", "owner"],
+      items: [{ title: "Danh sách nhân viên", url: "/employees" }],
+    },
+    {
       title: "Tuyến đường",
       url: "/routes",
       icon: "Navigation",

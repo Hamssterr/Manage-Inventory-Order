@@ -3,6 +3,7 @@ import {
   getBarChartData,
   getDashboardStats,
   getSalerRevenueData,
+  getSalerSalary,
   getSalerSellingProducts,
 } from "@/services/apis/report";
 import { QUERY_KEYS } from "@/constants/query-key";
@@ -12,6 +13,8 @@ import type {
   DashboardStats,
   ISellingProduct,
   SalerRevenueData,
+  SalerSalaryData,
+  SalerSalaryParams,
 } from "@/types/report";
 
 export const useGetDashboardStatsQuery = () => {
@@ -52,6 +55,14 @@ export const useGetSalerSellingProductsQuery = (
     queryKey: [QUERY_KEYS.REPORTS, "saler-selling-products", month, year],
     queryFn: () =>
       getSalerSellingProducts({ month, year }).then((res) => res.data.data),
+    placeholderData: keepPreviousData,
+  });
+};
+
+export const useGetSalerSalary = (params: SalerSalaryParams) => {
+  return useQuery<SalerSalaryData>({
+    queryKey: [QUERY_KEYS.REPORTS, "salary", params],
+    queryFn: () => getSalerSalary(params).then((res) => res.data.data),
     placeholderData: keepPreviousData,
   });
 };

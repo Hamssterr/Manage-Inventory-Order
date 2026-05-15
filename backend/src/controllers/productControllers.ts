@@ -40,13 +40,18 @@ export const createSaleProduct = asyncWrapper(
       }
 
       // Kiểm tra sản phẩm có tồn tại không
-      const componentIds = components.map(
+      const processedComponents = components.map((c: any) => ({
+        productId: c.productId?._id || c.productId,
+        quantityPerBaseUnit: Number(c.quantityPerBaseUnit),
+      }));
+
+      const componentIds = processedComponents.map(
         (c) => new mongoose.Types.ObjectId(c.productId),
       );
       const validProductsCount = await Product.countDocuments({
         _id: { $in: componentIds },
       }).session(session);
-      if (validProductsCount !== components.length) {
+      if (validProductsCount !== processedComponents.length) {
         throw new ErrorResponse("Some components are invalid", 400);
       }
 
@@ -56,6 +61,7 @@ export const createSaleProduct = asyncWrapper(
         exchangeValue: Number(u.exchangeValue),
         priceDefault: Number(u.priceDefault || 0),
         tax: Number(u.tax || 0),
+        salaryPerUnit: Number(u.salaryPerUnit || 0),
         isDefault: Boolean(u.isDefault || u.isDefalut),
       }));
 
@@ -91,7 +97,7 @@ export const createSaleProduct = asyncWrapper(
             isSale: isSale ?? true,
             isGift: false,
             isCombo: true,
-            components: components,
+            components: processedComponents,
             units: processedUnits,
             createdBy: userId,
             updatedBy: userId,
@@ -252,7 +258,12 @@ export const updateSaleProduct = asyncWrapper(
         throw new ErrorResponse("Vật phẩm con cần ít nhất 1 sản phẩm", 400);
       }
 
-      const componentIds = components.map(
+      const processedComponents = components.map((c: any) => ({
+        productId: c.productId?._id || c.productId,
+        quantityPerBaseUnit: Number(c.quantityPerBaseUnit),
+      }));
+
+      const componentIds = processedComponents.map(
         (c: any) => new mongoose.Types.ObjectId(c.productId),
       );
 
@@ -261,7 +272,7 @@ export const updateSaleProduct = asyncWrapper(
         isCombo: false,
       }).session(session);
 
-      if (validProductCount !== components.length) {
+      if (validProductCount !== processedComponents.length) {
         throw new ErrorResponse("Vật phẩm con không hợp lệ", 400);
       }
 
@@ -270,6 +281,7 @@ export const updateSaleProduct = asyncWrapper(
         exchangeValue: Number(u.exchangeValue),
         priceDefault: Number(u.priceDefault || 0),
         tax: Number(u.tax || 0),
+        salaryPerUnit: Number(u.salaryPerUnit || 0),
         isDefault: Boolean(u.isDefault || u.isDefalut),
       }));
 
@@ -302,7 +314,7 @@ export const updateSaleProduct = asyncWrapper(
       product.isSale = isSale ?? product.isSale;
 
       // Ghi đè hoàn toàn mảng components và units mới
-      product.components = components;
+      product.components = processedComponents;
       product.units = processedUnits;
 
       if (userId) {

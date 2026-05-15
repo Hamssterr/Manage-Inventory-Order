@@ -6,6 +6,7 @@ import {
   getChartData,
   getSalerRevenueDataReport,
   getTopSellingProducts,
+  getSalaryReport,
 } from "../controllers/reportControllers.js";
 import { protectAuth, restrictTo } from "../middlewares/authMiddleware.js";
 
@@ -49,6 +50,14 @@ router.get(
   protectAuth,
   restrictTo("salers"),
   getTopSellingProducts,
+);
+
+// Salary Report
+router.get(
+  "/salary",
+  protectAuth,
+  restrictTo("admin", "owner", "accountant", "salers"),
+  getSalaryReport,
 );
 
 export default router;

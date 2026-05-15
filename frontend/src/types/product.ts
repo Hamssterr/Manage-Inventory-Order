@@ -13,6 +13,7 @@ export interface IProductUnit {
   exchangeValue: number;
   priceDefault: number;
   tax?: number;
+  salaryPerUnit?: number;
   isDefault: boolean;
 }
 

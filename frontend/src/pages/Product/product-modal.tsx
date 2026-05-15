@@ -37,6 +37,7 @@ export const ProductModal = () => {
             priceDefault: u.priceDefault,
             isDefault: u.isDefault,
             tax: u.tax || 0,
+            salaryPerUnit: u.salaryPerUnit || 0,
             exchangeValue: u.exchangeValue,
           }))
         : [
@@ -45,6 +46,7 @@ export const ProductModal = () => {
               exchangeValue: 1,
               priceDefault: 0,
               tax: 0,
+              salaryPerUnit: 0,
               isDefault: true,
             },
           ],
